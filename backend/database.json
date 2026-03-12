@@ -1,0 +1,36 @@
+{
+  "folders": [
+    {
+      "id": "5c43567d-935a-497c-bb3d-5041d089976b",
+      "name": "test",
+      "createdAt": "2026-03-11T10:19:24.812023+00:00",
+      "owner": "admin",
+      "files": [
+        {
+          "id": "e772d139-2176-44a7-8b84-1f98bf6f067d",
+          "name": "GSC_Mallikarjun Roddannavar_CV.pptx",
+          "storedName": "673353f2-2940-4f87-84ee-4d66f593000b-GSC_Mallikarjun Roddannavar_CV.pptx",
+          "uploadedAt": "2026-03-11T10:22:40.871820+00:00",
+          "uploadedBy": "admin",
+          "size": 1953520
+        }
+      ]
+    },
+    {
+      "id": "629290f3-7c0e-4bef-9783-82a245cc292e",
+      "name": "test123",
+      "createdAt": "2026-03-11T10:24:24.414016+00:00",
+      "owner": "admin",
+      "files": [
+        {
+          "id": "41d4ef95-07d3-4fe9-92d7-b35a92d486e8",
+          "name": "GSC_Mallikarjun Roddannavar_CV.pptx",
+          "storedName": "f196a6d1-95aa-4ce2-a79a-3105d526e3b4-GSC_Mallikarjun Roddannavar_CV.pptx",
+          "uploadedAt": "2026-03-11T10:25:15.996062+00:00",
+          "uploadedBy": "admin",
+          "size": 1953520
+        }
+      ]
+    }
+  ]
+}
