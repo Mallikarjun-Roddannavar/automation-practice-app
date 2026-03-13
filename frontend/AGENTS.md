@@ -41,10 +41,15 @@ Frontend-specific instructions for `playwright-practice-app/frontend`.
 - Toast notifications via `react-toastify`
 
 ## Styling conventions
-- Reuse existing utility classes and semantic classes from `src/index.css`:
+- Reuse semantic classes from `src/index.css` whenever possible:
   - `btn-primary`, `btn-secondary`, `btn-danger`, `icon-btn`
-  - `app-card`, `app-input`, `app-table`, etc.
-- Keep button styles consistent; avoid ad hoc one-off button variants.
+  - `app-header`, `app-drawer`, `dropdown-panel`
+  - `app-workspace`, `app-dialog-panel`, `app-input`, `app-table`, `app-status-chip`
+- Keep the visual direction consistent:
+  - premium glassmorphic shell for header, sidebar, menus, and top-level chrome
+  - clearer work surfaces for forms, dialogs, and data-heavy screens
+  - denser, readable tables and crisp primary actions
+- Avoid ad hoc button variants, social-feed layouts, and heavy neumorphic treatment for primary actions.
 
 ## Verification commands
 - Install/update deps when needed:
@@ -58,3 +63,4 @@ Frontend-specific instructions for `playwright-practice-app/frontend`.
 - Prefer small, focused updates.
 - Keep component responsibilities clear.
 - If API contracts change, update `api.ts` and affected pages together.
+

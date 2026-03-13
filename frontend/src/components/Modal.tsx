@@ -13,18 +13,19 @@ export function Modal({ title, testId, children, onClose }: ModalProps) {
       className="app-overlay fixed inset-0 flex items-center justify-center p-4"
       data-testid={`${testId}-overlay`}
     >
-      <div className="app-card w-full max-w-md p-4" data-testid={testId}>
-        <div className="flex justify-between items-center">
-          <h2 className="text-lg font-semibold">{title}</h2>
+      <div className="app-dialog-panel" data-testid={testId}>
+        <div className="app-dialog-header">
+          <h2 className="app-dialog-title">{title}</h2>
           <button
+            type="button"
             onClick={onClose}
-            className="btn-secondary px-3 py-1"
+            className="btn-secondary px-3 py-2 text-sm"
             data-testid={`${testId}-close`}
           >
             Close
           </button>
         </div>
-        <div className="mt-4">{children}</div>
+        <div className="app-dialog-body">{children}</div>
       </div>
     </div>
   );

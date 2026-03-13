@@ -146,140 +146,160 @@ export function FoldersPage() {
 
   return (
     <AppLayout>
-      <div className="flex flex-wrap justify-between items-center gap-3">
-        <h2 className="text-2xl font-semibold" data-testid="folders-title">
-          Folders
-        </h2>
-        <div className="flex items-center gap-2">
-          <button
-            className="btn-secondary px-4 py-2"
-            onClick={refresh}
-            data-testid="folders-refresh-btn"
-          >
-            Refresh
-          </button>
-          {!isViewer && (
-            <button
-              className="btn-primary px-4 py-2 disabled:opacity-60"
-              onClick={() => {
-                setCreateError("");
-                setNewName("");
-                setShowCreate(true);
-              }}
-              disabled={!canCreateEdit}
-              data-testid="new-folder-btn"
-            >
-              New Folder
-            </button>
-          )}
-          {!isViewer && (
-            <button
-              className="btn-danger px-4 py-2 disabled:opacity-60"
-              onClick={() => setDeletingFoldersBulk(true)}
-              disabled={!canDelete || selectedFolderIds.length === 0}
-              data-testid="folders-bulk-delete-btn"
-            >
-              Delete Selected
-            </button>
-          )}
+      <section className="app-page">
+        <div className="app-section-head">
+          <div className="app-section-copy">
+            <p className="app-kicker">Workspace</p>
+            <h2 className="mt-3 text-3xl font-semibold" data-testid="folders-title">
+              Folders
+            </h2>
+            <p className="text-muted mt-2 text-sm">
+              Manage folder creation, renaming, navigation, and cleanup from one readable work
+              surface.
+            </p>
+          </div>
+          <div className="app-meta-row">
+            <div className="app-status-chip">Role: {user?.role ?? "guest"}</div>
+            <div className="app-status-chip">Selected: {selectedFolderIds.length}</div>
+          </div>
         </div>
-      </div>
-      <p className="text-muted mt-2 text-xs" data-testid="folders-last-synced">
-        Last synced at: {lastSyncedAt ? lastSyncedAt.toLocaleTimeString() : "--"}
-      </p>
 
-      {error && (
-        <p className="mt-4 text-sm text-red-600" data-testid="folders-error">
-          {error}
-        </p>
-      )}
+        <div className="app-workspace">
+          <div className="app-toolbar">
+            <p className="text-muted text-xs" data-testid="folders-last-synced">
+              Last synced at: {lastSyncedAt ? lastSyncedAt.toLocaleTimeString() : "--"}
+            </p>
+            <div className="app-toolbar-group">
+              <button
+                className="btn-secondary px-4 py-2"
+                onClick={refresh}
+                data-testid="folders-refresh-btn"
+              >
+                Refresh
+              </button>
+              {!isViewer && (
+                <button
+                  className="btn-primary px-4 py-2 disabled:opacity-60"
+                  onClick={() => {
+                    setCreateError("");
+                    setNewName("");
+                    setShowCreate(true);
+                  }}
+                  disabled={!canCreateEdit}
+                  data-testid="new-folder-btn"
+                >
+                  New Folder
+                </button>
+              )}
+              {!isViewer && (
+                <button
+                  className="btn-danger px-4 py-2 disabled:opacity-60"
+                  onClick={() => setDeletingFoldersBulk(true)}
+                  disabled={!canDelete || selectedFolderIds.length === 0}
+                  data-testid="folders-bulk-delete-btn"
+                >
+                  Delete Selected
+                </button>
+              )}
+            </div>
+          </div>
 
-      <div className="app-card mt-5 overflow-x-auto">
-        <table className="app-table text-left">
-          <thead className="text-sm">
-            <tr>
-              <th className="p-3">
-                <input
-                  type="checkbox"
-                  checked={folders.length > 0 && selectedFolderIds.length === folders.length}
-                  onChange={toggleAllFolders}
-                  data-testid="folders-select-all"
-                />
-              </th>
-              <th className="p-3">Name</th>
-              <th className="p-3">Created</th>
-              <th className="p-3">Owner</th>
-              <th className="p-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {folders.map((folder, index) => (
-              <tr key={folder.id} data-testid={`folder-row-${index + 1}`}>
-                <td className="p-3">
-                  <input
-                    type="checkbox"
-                    checked={selectedFolderIds.includes(folder.id)}
-                    onChange={() => toggleFolderSelection(folder.id)}
-                    data-testid={`folder-select-${folder.id}`}
-                  />
-                </td>
-                <td className="p-3">{folder.name}</td>
-                <td className="p-3">{new Date(folder.createdAt).toLocaleString()}</td>
-                <td className="p-3">{folder.owner}</td>
-                <td className="p-3">
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      className="btn-secondary px-3 py-1 disabled:opacity-60"
-                      onClick={() => navigate(`/folders/${folder.id}`)}
-                      disabled={!selectedFolderIds.includes(folder.id)}
-                      data-testid={`folder-open-btn-${folder.id}`}
-                    >
-                      Open
-                    </button>
-                    <a
-                      className={`btn-secondary px-3 py-1 ${
-                        !selectedFolderIds.includes(folder.id) ? "pointer-events-none opacity-60" : ""
-                      }`}
-                      href={`/folders/${folder.id}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      data-testid={`folder-open-new-tab-${folder.id}`}
-                    >
-                      Open in New Tab
-                    </a>
-                    <button
-                      className="btn-secondary px-3 py-1 disabled:opacity-60"
-                      onClick={() => {
-                        setEditingFolder(folder);
-                        setNewName(folder.name);
-                      }}
-                      disabled={!canCreateEdit || !selectedFolderIds.includes(folder.id)}
-                      data-testid={`folder-rename-btn-${folder.id}`}
-                    >
-                      Rename
-                    </button>
-                    {!isViewer && (
-                      <button
-                        className="btn-danger px-3 py-1 disabled:opacity-60"
-                        onClick={() => setDeletingFolder(folder)}
-                        disabled={!canDelete || !selectedFolderIds.includes(folder.id)}
-                        data-testid={`folder-delete-btn-${folder.id}`}
-                      >
-                        Delete
-                      </button>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {emptyState && (
-          <p className="text-muted p-4 text-sm" data-testid="folders-empty">
-            No folders yet.
-          </p>
-        )}
-      </div>
+          {error && (
+            <p className="app-alert app-alert-danger mt-4" data-testid="folders-error">
+              {error}
+            </p>
+          )}
+
+          <div className="app-table-wrap">
+            <table className="app-table text-left">
+              <thead className="text-sm">
+                <tr>
+                  <th className="p-3">
+                    <input
+                      type="checkbox"
+                      checked={folders.length > 0 && selectedFolderIds.length === folders.length}
+                      onChange={toggleAllFolders}
+                      data-testid="folders-select-all"
+                    />
+                  </th>
+                  <th className="p-3">Name</th>
+                  <th className="p-3">Created</th>
+                  <th className="p-3">Owner</th>
+                  <th className="p-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {folders.map((folder, index) => (
+                  <tr key={folder.id} data-testid={`folder-row-${index + 1}`}>
+                    <td className="p-3">
+                      <input
+                        type="checkbox"
+                        checked={selectedFolderIds.includes(folder.id)}
+                        onChange={() => toggleFolderSelection(folder.id)}
+                        data-testid={`folder-select-${folder.id}`}
+                      />
+                    </td>
+                    <td className="p-3">{folder.name}</td>
+                    <td className="p-3">{new Date(folder.createdAt).toLocaleString()}</td>
+                    <td className="p-3">{folder.owner}</td>
+                    <td className="p-3">
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          className="btn-secondary px-3 py-2 disabled:opacity-60"
+                          onClick={() => navigate(`/folders/${folder.id}`)}
+                          disabled={!selectedFolderIds.includes(folder.id)}
+                          data-testid={`folder-open-btn-${folder.id}`}
+                        >
+                          Open
+                        </button>
+                        <a
+                          className={`btn-secondary px-3 py-2 ${
+                            !selectedFolderIds.includes(folder.id)
+                              ? "pointer-events-none opacity-60"
+                              : ""
+                          }`}
+                          href={`/folders/${folder.id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          data-testid={`folder-open-new-tab-${folder.id}`}
+                        >
+                          Open in New Tab
+                        </a>
+                        <button
+                          className="btn-secondary px-3 py-2 disabled:opacity-60"
+                          onClick={() => {
+                            setEditingFolder(folder);
+                            setNewName(folder.name);
+                          }}
+                          disabled={!canCreateEdit || !selectedFolderIds.includes(folder.id)}
+                          data-testid={`folder-rename-btn-${folder.id}`}
+                        >
+                          Rename
+                        </button>
+                        {!isViewer && (
+                          <button
+                            className="btn-danger px-3 py-2 disabled:opacity-60"
+                            onClick={() => setDeletingFolder(folder)}
+                            disabled={!canDelete || !selectedFolderIds.includes(folder.id)}
+                            data-testid={`folder-delete-btn-${folder.id}`}
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {emptyState && (
+              <p className="app-empty-state" data-testid="folders-empty">
+                No folders yet.
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
 
       {showCreate && (
         <Modal
@@ -300,18 +320,20 @@ export function FoldersPage() {
             data-testid="create-folder-input"
           />
           {createError && (
-            <p className="mt-2 text-sm text-red-600" data-testid="create-folder-error">
+            <p className="app-alert app-alert-danger mt-3" data-testid="create-folder-error">
               {createError}
             </p>
           )}
-          <button
-            className="btn-primary mt-3 px-4 py-2 disabled:opacity-60"
-            onClick={createFolder}
-            disabled={!newName.trim() || submitting}
-            data-testid="create-folder-submit"
-          >
-            {submitting ? "Creating..." : "Create"}
-          </button>
+          <div className="app-dialog-actions">
+            <button
+              className="btn-primary px-4 py-2 disabled:opacity-60"
+              onClick={createFolder}
+              disabled={!newName.trim() || submitting}
+              data-testid="create-folder-submit"
+            >
+              {submitting ? "Creating..." : "Create"}
+            </button>
+          </div>
         </Modal>
       )}
 
@@ -327,14 +349,16 @@ export function FoldersPage() {
             onChange={(event) => setNewName(event.target.value)}
             data-testid="rename-folder-input"
           />
-          <button
-            className="btn-primary mt-3 px-4 py-2 disabled:opacity-60"
-            onClick={renameFolder}
-            disabled={!newName.trim() || submitting}
-            data-testid="rename-folder-submit"
-          >
-            {submitting ? "Saving..." : "Save"}
-          </button>
+          <div className="app-dialog-actions">
+            <button
+              className="btn-primary px-4 py-2 disabled:opacity-60"
+              onClick={renameFolder}
+              disabled={!newName.trim() || submitting}
+              data-testid="rename-folder-submit"
+            >
+              {submitting ? "Saving..." : "Save"}
+            </button>
+          </div>
         </Modal>
       )}
 

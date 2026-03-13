@@ -33,7 +33,7 @@ export function FilesPage() {
     try {
       const [allFolders, folderFiles] = await Promise.all([
         api.listFolders(user),
-        api.listFiles(user, folderId)
+        api.listFiles(user, folderId),
       ]);
       setFolders(allFolders);
       setFiles(folderFiles);
@@ -129,169 +129,192 @@ export function FilesPage() {
   function downloadFile(fileId: string) {
     if (!user || !folderId) return;
     const url = api.buildFileDownloadUrl(user, folderId, fileId);
-    window.open(url, `_blank`);
+    window.open(url, "_blank");
   }
 
   function downloadMultipleFiles(fileIds?: string[]) {
     if (!user || !folderId) return;
     const url = api.buildFilesDownloadUrl(user, folderId, fileIds);
-    window.open(url, `_blank`);
+    window.open(url, "_blank");
   }
 
   return (
     <AppLayout>
-      <div className="flex items-center gap-2">
-        <button
-          className="btn-secondary px-3 py-1"
-          onClick={() => navigate("/folders")}
-          data-testid="files-back-btn"
-        >
-          Back to folders
-        </button>
-        <button
-          className="btn-secondary px-3 py-1"
-          onClick={refresh}
-          data-testid="files-refresh-btn"
-        >
-          Refresh
-        </button>
-        {!isViewer && (
-          <button
-            className="btn-primary px-3 py-1 disabled:opacity-60"
-            onClick={() => setShowUploadDialog(true)}
-            disabled={!canCreateEdit}
-            data-testid="files-upload-action-btn"
-          >
-            Upload File
-          </button>
-        )}
-        <button
-          className="btn-secondary px-3 py-1 disabled:opacity-60"
-          onClick={() => downloadMultipleFiles()}
-          disabled={files.length === 0}
-          data-testid="files-download-all-btn"
-        >
-          Download All
-        </button>
-        {canDelete && (
-          <button
-            className="btn-secondary px-3 py-1 disabled:opacity-60"
-            onClick={() => downloadMultipleFiles(selectedFileIds)}
-            disabled={selectedFileIds.length === 0}
-            data-testid="files-download-selected-btn"
-          >
-            Download Selected
-          </button>
-        )}
-        {!isViewer && (
-          <button
-            className="btn-danger px-3 py-1 disabled:opacity-60"
-            onClick={() => setDeletingFilesBulk(true)}
-            disabled={!canDelete || selectedFileIds.length === 0}
-            data-testid="files-bulk-delete-btn"
-          >
-            Delete Selected
-          </button>
-        )}
-      </div>
-      <h2 className="mt-4 text-2xl font-semibold" data-testid="files-title">
-        Files in {currentFolder?.name ?? "Folder"}
-      </h2>
-      <p className="text-muted mt-2 text-xs" data-testid="files-last-synced">
-        Last synced at: {lastSyncedAt ? lastSyncedAt.toLocaleTimeString() : "--"}
-      </p>
+      <section className="app-page">
+        <div className="app-section-head">
+          <div className="app-section-copy">
+            <p className="app-kicker">File Workspace</p>
+            <h2 className="mt-3 text-3xl font-semibold" data-testid="files-title">
+              Files in {currentFolder?.name ?? "Folder"}
+            </h2>
+            <p className="text-muted mt-2 text-sm">
+              Review uploads, previews, downloads, and cleanup actions from a clearer content
+              surface.
+            </p>
+          </div>
+          <div className="app-meta-row">
+            <div className="app-status-chip">Folder: {currentFolder?.name ?? "Unknown"}</div>
+            <div className="app-status-chip">Selected: {selectedFileIds.length}</div>
+          </div>
+        </div>
 
-      {error && (
-        <p className="mt-3 text-sm text-red-600" data-testid="files-error">
-          {error}
-        </p>
-      )}
+        <div className="app-workspace">
+          <div className="app-toolbar">
+            <div className="app-toolbar-group">
+              <button
+                className="btn-secondary px-4 py-2"
+                onClick={() => navigate("/folders")}
+                data-testid="files-back-btn"
+              >
+                Back to folders
+              </button>
+              <button
+                className="btn-secondary px-4 py-2"
+                onClick={refresh}
+                data-testid="files-refresh-btn"
+              >
+                Refresh
+              </button>
+            </div>
+            <div className="app-toolbar-group">
+              {!isViewer && (
+                <button
+                  className="btn-primary px-4 py-2 disabled:opacity-60"
+                  onClick={() => setShowUploadDialog(true)}
+                  disabled={!canCreateEdit}
+                  data-testid="files-upload-action-btn"
+                >
+                  Upload File
+                </button>
+              )}
+              <button
+                className="btn-secondary px-4 py-2 disabled:opacity-60"
+                onClick={() => downloadMultipleFiles()}
+                disabled={files.length === 0}
+                data-testid="files-download-all-btn"
+              >
+                Download All
+              </button>
+              {canDelete && (
+                <button
+                  className="btn-secondary px-4 py-2 disabled:opacity-60"
+                  onClick={() => downloadMultipleFiles(selectedFileIds)}
+                  disabled={selectedFileIds.length === 0}
+                  data-testid="files-download-selected-btn"
+                >
+                  Download Selected
+                </button>
+              )}
+              {!isViewer && (
+                <button
+                  className="btn-danger px-4 py-2 disabled:opacity-60"
+                  onClick={() => setDeletingFilesBulk(true)}
+                  disabled={!canDelete || selectedFileIds.length === 0}
+                  data-testid="files-bulk-delete-btn"
+                >
+                  Delete Selected
+                </button>
+              )}
+            </div>
+          </div>
 
-      <div className="app-card mt-5 overflow-x-auto">
-        <table className="app-table text-left">
-          <thead className="text-sm">
-            <tr>
-              <th className="p-3">
-                <input
-                  type="checkbox"
-                  checked={files.length > 0 && selectedFileIds.length === files.length}
-                  onChange={toggleAllFiles}
-                  data-testid="files-select-all"
-                />
-              </th>
-              <th className="p-3">Name</th>
-              <th className="p-3">Size</th>
-              <th className="p-3">Uploaded By</th>
-              <th className="p-3">Uploaded At</th>
-              <th className="p-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {files.map((file, index) => (
-              <tr key={file.id} data-testid={`file-row-${index + 1}`}>
-                <td className="p-3">
-                  <input
-                    type="checkbox"
-                    checked={selectedFileIds.includes(file.id)}
-                    onChange={() => toggleFileSelection(file.id)}
-                    data-testid={`file-select-${file.id}`}
-                  />
-                </td>
-                <td className="p-3">{file.name}</td>
-                <td className="p-3">{file.size}</td>
-                <td className="p-3">{file.uploadedBy}</td>
-                <td className="p-3">{new Date(file.uploadedAt).toLocaleString()}</td>
-                <td className="p-3">
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      className="btn-secondary px-3 py-1 disabled:opacity-60"
-                      onClick={() => {
-                        setRenamingFile(file);
-                        setNewName(file.name);
-                      }}
-                      disabled={!canCreateEdit || !selectedFileIds.includes(file.id)}
-                      data-testid={`file-rename-btn-${file.id}`}
-                    >
-                      Rename
-                    </button>
-                    <button
-                      className="btn-secondary px-3 py-1 disabled:opacity-60"
-                      onClick={() => previewFile(file.id)}
-                      disabled={!selectedFileIds.includes(file.id)}
-                      data-testid={`file-preview-btn-${file.id}`}
-                    >
-                      Preview
-                    </button>
-                    <button
-                      className="btn-secondary px-3 py-1 disabled:opacity-60"
-                      onClick={() => downloadFile(file.id)}
-                      disabled={!selectedFileIds.includes(file.id)}
-                      data-testid={`file-download-btn-${file.id}`}
-                    >
-                      Download
-                    </button>
-                    {!isViewer && (
-                      <button
-                        className="btn-danger px-3 py-1 disabled:opacity-60"
-                        onClick={() => setDeletingFile(file)}
-                        disabled={!canDelete || !selectedFileIds.includes(file.id)}
-                        data-testid={`file-delete-btn-${file.id}`}
-                      >
-                        Delete
-                      </button>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {files.length === 0 && (
-          <p className="text-muted p-4 text-sm" data-testid="files-empty">
-            No files in this folder.
+          <p className="text-muted mt-4 text-xs" data-testid="files-last-synced">
+            Last synced at: {lastSyncedAt ? lastSyncedAt.toLocaleTimeString() : "--"}
           </p>
-        )}
-      </div>
+
+          {error && (
+            <p className="app-alert app-alert-danger mt-4" data-testid="files-error">
+              {error}
+            </p>
+          )}
+
+          <div className="app-table-wrap">
+            <table className="app-table text-left">
+              <thead className="text-sm">
+                <tr>
+                  <th className="p-3">
+                    <input
+                      type="checkbox"
+                      checked={files.length > 0 && selectedFileIds.length === files.length}
+                      onChange={toggleAllFiles}
+                      data-testid="files-select-all"
+                    />
+                  </th>
+                  <th className="p-3">Name</th>
+                  <th className="p-3">Size</th>
+                  <th className="p-3">Uploaded By</th>
+                  <th className="p-3">Uploaded At</th>
+                  <th className="p-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {files.map((file, index) => (
+                  <tr key={file.id} data-testid={`file-row-${index + 1}`}>
+                    <td className="p-3">
+                      <input
+                        type="checkbox"
+                        checked={selectedFileIds.includes(file.id)}
+                        onChange={() => toggleFileSelection(file.id)}
+                        data-testid={`file-select-${file.id}`}
+                      />
+                    </td>
+                    <td className="p-3">{file.name}</td>
+                    <td className="p-3">{file.size}</td>
+                    <td className="p-3">{file.uploadedBy}</td>
+                    <td className="p-3">{new Date(file.uploadedAt).toLocaleString()}</td>
+                    <td className="p-3">
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          className="btn-secondary px-3 py-2 disabled:opacity-60"
+                          onClick={() => {
+                            setRenamingFile(file);
+                            setNewName(file.name);
+                          }}
+                          disabled={!canCreateEdit || !selectedFileIds.includes(file.id)}
+                          data-testid={`file-rename-btn-${file.id}`}
+                        >
+                          Rename
+                        </button>
+                        <button
+                          className="btn-secondary px-3 py-2 disabled:opacity-60"
+                          onClick={() => previewFile(file.id)}
+                          disabled={!selectedFileIds.includes(file.id)}
+                          data-testid={`file-preview-btn-${file.id}`}
+                        >
+                          Preview
+                        </button>
+                        <button
+                          className="btn-secondary px-3 py-2 disabled:opacity-60"
+                          onClick={() => downloadFile(file.id)}
+                          disabled={!selectedFileIds.includes(file.id)}
+                          data-testid={`file-download-btn-${file.id}`}
+                        >
+                          Download
+                        </button>
+                        {!isViewer && (
+                          <button
+                            className="btn-danger px-3 py-2 disabled:opacity-60"
+                            onClick={() => setDeletingFile(file)}
+                            disabled={!canDelete || !selectedFileIds.includes(file.id)}
+                            data-testid={`file-delete-btn-${file.id}`}
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {files.length === 0 && (
+              <p className="app-empty-state" data-testid="files-empty">
+                No files in this folder.
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
 
       {renamingFile && (
         <Modal
@@ -305,13 +328,15 @@ export function FilesPage() {
             onChange={(event) => setNewName(event.target.value)}
             data-testid="rename-file-input"
           />
-          <button
-            className="btn-primary mt-3 px-4 py-2"
-            onClick={renameFile}
-            data-testid="rename-file-submit"
-          >
-            Save
-          </button>
+          <div className="app-dialog-actions">
+            <button
+              className="btn-primary px-4 py-2"
+              onClick={renameFile}
+              data-testid="rename-file-submit"
+            >
+              Save
+            </button>
+          </div>
         </Modal>
       )}
 
@@ -331,14 +356,16 @@ export function FilesPage() {
             data-testid="upload-file-input"
             disabled={!canCreateEdit}
           />
-          <button
-            className="btn-primary mt-3 px-4 py-2 disabled:opacity-60"
-            onClick={upload}
-            disabled={!selectedFile || !canCreateEdit}
-            data-testid="upload-file-btn"
-          >
-            Upload File
-          </button>
+          <div className="app-dialog-actions">
+            <button
+              className="btn-primary px-4 py-2 disabled:opacity-60"
+              onClick={upload}
+              disabled={!selectedFile || !canCreateEdit}
+              data-testid="upload-file-btn"
+            >
+              Upload File
+            </button>
+          </div>
         </Modal>
       )}
 

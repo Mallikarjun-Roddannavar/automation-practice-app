@@ -29,81 +29,89 @@ export function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="app-shell">
       <header className="app-header fixed inset-x-0 top-0 z-20 flex items-center justify-between px-4 py-3">
-        <button
-          type="button"
-          className="icon-btn rounded px-3 py-2 shadow"
-          onClick={() => setNavOpen(true)}
-          data-testid="hamburger-menu-btn"
-          aria-label="Open navigation menu"
-        >
-          <span className="mb-1 block h-0.5 w-5 bg-current" />
-          <span className="mb-1 block h-0.5 w-5 bg-current" />
-          <span className="block h-0.5 w-5 bg-current" />
-        </button>
-        <h1 className="app-header-title text-base" data-testid="header-app-name">
-          Playwright Practice App
-        </h1>
-        <div className="relative">
+        <div className="flex items-center gap-3">
           <button
             type="button"
-            className="icon-btn flex h-10 w-10 items-center justify-center overflow-hidden rounded-full"
-            onClick={() => setProfileOpen((prev) => !prev)}
-            data-testid="profile-menu-btn"
-            aria-label="Open profile menu"
+            className="icon-btn rounded px-3 py-2 shadow"
+            onClick={() => setNavOpen(true)}
+            data-testid="hamburger-menu-btn"
+            aria-label="Open navigation menu"
           >
-            {profileIcon ? (
-              <img
-                src={profileIcon}
-                alt="Profile"
-                className="h-full w-full object-cover"
-                data-testid="header-profile-icon-img"
-              />
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                className="h-5 w-5"
-              >
-                <circle cx="12" cy="8" r="4" />
-                <path d="M4 20c1.6-3.2 4.6-5 8-5s6.4 1.8 8 5" />
-              </svg>
-            )}
+            <span className="mb-1 block h-0.5 w-5 bg-current" />
+            <span className="mb-1 block h-0.5 w-5 bg-current" />
+            <span className="block h-0.5 w-5 bg-current" />
           </button>
-          {profileOpen && (
-            <div
-              className="dropdown-panel absolute right-0 mt-2 w-56 p-3"
-              data-testid="profile-menu"
+          <div className="app-brand-lockup">
+            <p className="app-header-eyebrow">File management workspace</p>
+            <h1 className="app-header-title text-base" data-testid="header-app-name">
+              Playwright Practice App
+            </h1>
+          </div>
+        </div>
+        <div className="app-header-actions">
+          {user && <div className="app-header-badge">Role: {user.role}</div>}
+          <div className="relative">
+            <button
+              type="button"
+              className="icon-btn flex h-10 w-10 items-center justify-center overflow-hidden rounded-full"
+              onClick={() => setProfileOpen((prev) => !prev)}
+              data-testid="profile-menu-btn"
+              aria-label="Open profile menu"
             >
-              <p className="text-sm" data-testid="profile-username">
-                {user?.username}
-              </p>
-              <p className="text-muted mt-1 text-xs" data-testid="profile-role">
-                Role: {user?.role}
-              </p>
-              <button
-                type="button"
-                className="btn-secondary mt-3 w-full py-2 text-sm font-medium"
-                onClick={() => {
-                  setProfileOpen(false);
-                  navigate("/preferences");
-                }}
-                data-testid="profile-preferences-btn"
+              {profileIcon ? (
+                <img
+                  src={profileIcon}
+                  alt="Profile"
+                  className="h-full w-full object-cover"
+                  data-testid="header-profile-icon-img"
+                />
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  className="h-5 w-5"
+                >
+                  <circle cx="12" cy="8" r="4" />
+                  <path d="M4 20c1.6-3.2 4.6-5 8-5s6.4 1.8 8 5" />
+                </svg>
+              )}
+            </button>
+            {profileOpen && (
+              <div
+                className="dropdown-panel absolute right-0 mt-3 w-64 p-4"
+                data-testid="profile-menu"
               >
-                Change Preferences
-              </button>
-              <button
-                type="button"
-                className="btn-primary mt-3 w-full py-2 text-sm font-medium"
-                onClick={logout}
-                data-testid="profile-logout-btn"
-              >
-                Logout
-              </button>
-            </div>
-          )}
+                <p className="text-sm font-medium" data-testid="profile-username">
+                  {user?.username}
+                </p>
+                <p className="text-muted mt-1 text-xs" data-testid="profile-role">
+                  Role: {user?.role}
+                </p>
+                <button
+                  type="button"
+                  className="btn-secondary mt-4 w-full py-2 text-sm font-medium"
+                  onClick={() => {
+                    setProfileOpen(false);
+                    navigate("/preferences");
+                  }}
+                  data-testid="profile-preferences-btn"
+                >
+                  Change Preferences
+                </button>
+                <button
+                  type="button"
+                  className="btn-primary mt-3 w-full py-2 text-sm font-medium"
+                  onClick={logout}
+                  data-testid="profile-logout-btn"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </header>
       <Sidebar isOpen={navOpen} onClose={() => setNavOpen(false)} />

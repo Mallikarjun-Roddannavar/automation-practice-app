@@ -8,13 +8,13 @@ import { useAuth } from "../context/AuthContext";
 export function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [username, setUsername] = useState("admin");
-  const [password, setPassword] = useState("admin123");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [oauthLoading, setOauthLoading] = useState(false);
 
-  async function onSubmit(event: React.FormEvent) {
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
     setError("");
@@ -47,58 +47,92 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <form
-        className="app-card w-full max-w-md p-6"
-        onSubmit={onSubmit}
-        data-testid="login-form"
-      >
-        <h1 className="text-xl font-semibold">Playwright Practice Login</h1>
-        <p className="text-muted mt-1 text-sm" data-testid="login-hint">
-          Roles: admin/admin123, editor/editor123, viewer/viewer123
-        </p>
-        <div className="mt-4">
-          <label className="block text-sm font-medium">Username</label>
-          <input
-            className="app-input mt-1"
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
-            data-testid="login-username"
-          />
-        </div>
-        <div className="mt-4">
-          <label className="block text-sm font-medium">Password</label>
-          <input
-            type="password"
-            className="app-input mt-1"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            data-testid="login-password"
-          />
-        </div>
-        {error && (
-          <p className="mt-3 text-sm text-red-600" data-testid="login-error">
-            {error}
+    <div className="app-login-shell">
+      <div className="app-login-grid">
+        <section className="app-card app-login-intro">
+          <p className="app-kicker">Welcome</p>
+          <h1 className="mt-3 text-3xl font-semibold">Playwright Practice App</h1>
+          <p className="text-muted mt-3 text-sm">
+            A file-management workspace for UI and API automation practice, with realistic RBAC,
+            dialogs, polling, and navigation behavior.
           </p>
-        )}
-        <button
-          type="submit"
-          className="btn-primary mt-5 w-full py-2 disabled:opacity-60"
-          disabled={loading}
-          data-testid="login-submit"
+          <div className="app-login-role-grid mt-6">
+            <div className="app-login-role-card">
+              <p className="text-muted text-xs uppercase tracking-[0.12em]">Admin</p>
+              <p className="mt-2 font-semibold">Create, edit, and delete</p>
+            </div>
+            <div className="app-login-role-card">
+              <p className="text-muted text-xs uppercase tracking-[0.12em]">Editor</p>
+              <p className="mt-2 font-semibold">Create and edit content</p>
+            </div>
+            <div className="app-login-role-card">
+              <p className="text-muted text-xs uppercase tracking-[0.12em]">Viewer</p>
+              <p className="mt-2 font-semibold">Read-only verification</p>
+            </div>
+          </div>
+          <div className="app-preview-tile mt-6">
+            <p className="text-sm font-medium">Why this environment is useful</p>
+            <div className="app-login-checklist mt-4 text-sm text-muted">
+              <div className="app-login-checklist-item">Folder and file CRUD flows</div>
+              <div className="app-login-checklist-item">Stable test IDs for Playwright selectors</div>
+              <div className="app-login-checklist-item">OAuth and username/password sign-in paths</div>
+            </div>
+          </div>
+        </section>
+
+        <form
+          className="app-workspace app-login-form-panel w-full"
+          onSubmit={onSubmit}
+          data-testid="login-form"
         >
-          {loading ? "Signing in..." : "Login"}
-        </button>
-        <button
-          type="button"
-          className="btn-secondary mt-3 w-full py-2 disabled:opacity-60"
-          disabled={oauthLoading}
-          onClick={onOAuthLogin}
-          data-testid="oauth-login-btn"
-        >
-          {oauthLoading ? "Redirecting..." : "Login with OAuth"}
-        </button>
-      </form>
+          <p className="app-kicker">Sign in</p>
+          <h2 className="mt-3 text-2xl font-semibold">Access your workspace</h2>
+          <p className="text-muted mt-2 text-sm" data-testid="login-hint">
+            Roles: admin/admin123, editor/editor123, viewer/viewer123
+          </p>
+          <div className="mt-5">
+            <label className="block text-sm font-medium">Username</label>
+            <input
+              className="app-input mt-1"
+              value={username}
+              onChange={(event) => setUsername(event.target.value)}
+              data-testid="login-username"
+            />
+          </div>
+          <div className="mt-4">
+            <label className="block text-sm font-medium">Password</label>
+            <input
+              type="password"
+              className="app-input mt-1"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              data-testid="login-password"
+            />
+          </div>
+          {error && (
+            <p className="app-alert app-alert-danger mt-4 text-sm" data-testid="login-error">
+              {error}
+            </p>
+          )}
+          <button
+            type="submit"
+            className="btn-primary mt-5 w-full py-3 disabled:opacity-60"
+            disabled={loading}
+            data-testid="login-submit"
+          >
+            {loading ? "Signing in..." : "Login"}
+          </button>
+          <button
+            type="button"
+            className="btn-secondary mt-3 w-full py-3 disabled:opacity-60"
+            disabled={oauthLoading}
+            onClick={onOAuthLogin}
+            data-testid="oauth-login-btn"
+          >
+            {oauthLoading ? "Redirecting..." : "Login with OAuth"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

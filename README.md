@@ -1,4 +1,4 @@
-﻿# Playwright Practice App
+# Playwright Practice App
 
 File Management System for Playwright UI and API automation practice.
 
@@ -13,27 +13,27 @@ For AI coding agents and contributors, follow these instruction files:
 
 ```text
 /playwright-practice-app
-├── /backend
-│   ├── auth.py
-│   ├── main.py
-│   ├── models.py
-│   ├── database.json
-│   ├── /uploads
-│   └── requirements.txt
-├── /frontend
-│   ├── /src
-│   │   ├── /components
-│   │   ├── /pages
-│   │   ├── /context
-│   │   └── App.tsx
-│   ├── package.json
-│   └── tailwind.config.js
-├── /tests
-│   ├── /api
-│   ├── /core
-│   ├── /ui
-│   └── playwright.config.ts
-└── README.md
++-- /backend
+�   +-- auth.py
+�   +-- main.py
+�   +-- models.py
+�   +-- database.json
+�   +-- /uploads
+�   +-- requirements.txt
++-- /frontend
+�   +-- /src
+�   �   +-- /components
+�   �   +-- /pages
+�   �   +-- /context
+�   �   +-- App.tsx
+�   +-- package.json
+�   +-- tailwind.config.js
++-- /tests
+�   +-- /api
+�   +-- /core
+�   +-- /ui
+�   +-- playwright.config.ts
++-- README.md
 ```
 
 ## Role Credentials
@@ -112,6 +112,12 @@ UI behavior for Playwright practice:
 - Folder and File pages support 5-second auto-polling and manual `Refresh` buttons.
 - Toast notifications are enabled via `react-toastify` for async success/error flows.
 
+Frontend visual direction:
+- premium glassmorphic shell for header, sidebar, and menus
+- clearer work surfaces for forms, dialogs, and CRUD screens
+- denser, more enterprise-like tables for data-heavy pages
+- crisp high-contrast primary actions instead of heavy neumorphic controls
+
 ## Refresh / Rerun After Code Changes
 
 ### Backend (API)
@@ -151,23 +157,23 @@ The `tests` folder is now structured for both UI and API automation, with POM an
 
 ```text
 /tests
-├── /api
-│   ├── ApiClient.ts
-│   ├── authorization.spec.ts
-│   └── health.spec.ts
-├── /core
-│   ├── auth.setup.ts
-│   ├── env.ts
-│   └── paths.ts
-├── /ui
-│   ├── /auth
-│   ├── /e2e
-│   ├── /fixtures
-│   └── /pom
-├── .env.example
-├── package.json
-├── playwright.config.ts
-└── tsconfig.json
++-- /api
+�   +-- ApiClient.ts
+�   +-- authorization.spec.ts
+�   +-- health.spec.ts
++-- /core
+�   +-- auth.setup.ts
+�   +-- env.ts
+�   +-- paths.ts
++-- /ui
+�   +-- /auth
+�   +-- /e2e
+�   +-- /fixtures
+�   +-- /pom
++-- .env.example
++-- package.json
++-- playwright.config.ts
++-- tsconfig.json
 ```
 
 ### Setup
@@ -203,3 +209,4 @@ npx playwright test --project=api
 - Uses Page Object Model classes under `tests/ui/pom`.
 - Separates API specs from UI specs and uses a shared API client helper.
 - Uses isolated browser contexts per role for parallel-safe multi-user testing.
+
