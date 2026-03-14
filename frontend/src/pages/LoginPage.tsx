@@ -53,29 +53,15 @@ export function LoginPage() {
           <p className="app-kicker">Welcome</p>
           <h1 className="mt-3 text-3xl font-semibold">Playwright Practice App</h1>
           <p className="text-muted mt-3 text-sm">
-            A file-management workspace for UI and API automation practice, with realistic RBAC,
-            dialogs, polling, and navigation behavior.
+            Sign in to access the file-management workspace and validate realistic UI and API flows.
           </p>
-          <div className="app-login-role-grid mt-6">
-            <div className="app-login-role-card">
-              <p className="text-muted text-xs uppercase tracking-[0.12em]">Admin</p>
-              <p className="mt-2 font-semibold">Create, edit, and delete</p>
-            </div>
-            <div className="app-login-role-card">
-              <p className="text-muted text-xs uppercase tracking-[0.12em]">Editor</p>
-              <p className="mt-2 font-semibold">Create and edit content</p>
-            </div>
-            <div className="app-login-role-card">
-              <p className="text-muted text-xs uppercase tracking-[0.12em]">Viewer</p>
-              <p className="mt-2 font-semibold">Read-only verification</p>
-            </div>
-          </div>
+
           <div className="app-preview-tile mt-6">
-            <p className="text-sm font-medium">Why this environment is useful</p>
+            <p className="text-sm font-medium">Sign-in guidance</p>
             <div className="app-login-checklist mt-4 text-sm text-muted">
-              <div className="app-login-checklist-item">Folder and file CRUD flows</div>
-              <div className="app-login-checklist-item">Stable test IDs for Playwright selectors</div>
-              <div className="app-login-checklist-item">OAuth and username/password sign-in paths</div>
+              <div className="app-login-checklist-item">Use one of the demo role accounts below</div>
+              <div className="app-login-checklist-item">Choose username/password or OAuth</div>
+              <div className="app-login-checklist-item">After sign-in, the full workspace overview is available on home</div>
             </div>
           </div>
         </section>

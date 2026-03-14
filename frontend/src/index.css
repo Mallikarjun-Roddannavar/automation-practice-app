@@ -334,22 +334,25 @@ table {
     0 10px 24px rgba(15, 118, 110, 0.08);
 }
 
-.app-header-badge {
+.app-header-badge,
+.app-status-chip {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
   border-radius: 9999px;
   border: 1px solid var(--app-border);
-  background: color-mix(in srgb, var(--app-accent-soft) 46%, white 54%);
-  padding: 0.5rem 0.8rem;
+  background: color-mix(in srgb, var(--app-accent-soft) 48%, white 52%);
+  padding: 0.48rem 0.82rem;
   color: var(--app-accent-strong);
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   font-weight: 800;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
-.dark .app-header-badge {
+.dark .app-header-badge,
+.dark .app-status-chip {
   background: color-mix(in srgb, var(--app-accent-soft) 74%, transparent 26%);
   color: var(--app-accent);
 }
@@ -601,23 +604,9 @@ table {
   gap: 0.75rem;
 }
 
-.app-status-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  border-radius: 9999px;
-  border: 1px solid var(--app-border);
-  background: color-mix(in srgb, var(--app-accent-soft) 52%, white 48%);
-  padding: 0.45rem 0.8rem;
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--app-accent-strong);
-}
 
-.dark .app-status-chip {
-  background: color-mix(in srgb, var(--app-accent-soft) 72%, transparent 28%);
-  color: var(--app-accent);
-}
+
+
 
 .app-alert {
   border-radius: 1rem;
@@ -1495,11 +1484,12 @@ table {
   gap: 0.75rem;
 }
 
-.app-preview-tile {
-  border-radius: 1.15rem;
+.app-preview-tile,
+.app-login-role-card {
+  border-radius: 1.05rem;
   border: 1px solid var(--app-border);
   background: color-mix(in srgb, var(--app-surface-strong) 84%, white 16%);
-  padding: 1rem;
+  padding: 0.95rem;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
 }
 
@@ -1553,6 +1543,28 @@ table {
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--app-panel) 92%, white 8%), var(--app-panel-strong));
 }
+.app-login-intro::before,
+.app-login-form-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, rgba(255, 255, 255, 0.2) 70%, transparent 30%);
+  pointer-events: none;
+}
+
+.app-login-role-grid {
+  gap: 0.85rem;
+}
+
+.app-login-role-card p:first-child,
+.app-preview-tile p:first-child {
+  letter-spacing: 0.08em;
+}
+
+.app-preview-tile .app-login-checklist {
+  gap: 0.8rem;
+}
 
 .app-login-role-grid {
   display: grid;
@@ -1560,13 +1572,7 @@ table {
   gap: 0.75rem;
 }
 
-.app-login-role-card {
-  border-radius: 1rem;
-  border: 1px solid var(--app-border);
-  background: color-mix(in srgb, var(--app-surface-strong) 82%, white 18%);
-  padding: 0.95rem;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24);
-}
+
 .app-login-intro .app-kicker,
 .app-login-form-panel .app-kicker {
   margin-bottom: 0.15rem;
@@ -1883,16 +1889,19 @@ input[type="checkbox"] {
     filter: none;
   }
 
-  .app-folder-card-head {
+  .app-folder-card-head,
+  .app-file-card-head {
     align-items: flex-start;
   }
 
-  .app-folder-card {
+  .app-folder-card,
+  .app-file-card {
     --app-card-tilt-x: 0deg;
     --app-card-tilt-y: 0deg;
   }
 
-  .app-folder-card-footer {
+  .app-folder-card-footer,
+  .app-file-card-footer {
     max-height: none;
     opacity: 1;
     transform: none;
@@ -1902,12 +1911,16 @@ input[type="checkbox"] {
   }
 
   .app-folder-card-links,
-  .app-folder-card-footer .app-row-actions {
+  .app-folder-card-footer .app-row-actions,
+  .app-file-card-links,
+  .app-file-card-footer .app-row-actions {
     flex-direction: column;
   }
 
   .app-folder-card-links > *,
-  .app-folder-card-footer .app-row-actions > * {
+  .app-folder-card-footer .app-row-actions > *,
+  .app-file-card-links > *,
+  .app-file-card-footer .app-row-actions > * {
     width: 100%;
   }
 
@@ -1934,6 +1947,7 @@ input[type="checkbox"] {
     width: min(19rem, calc(100vw - 2rem));
   }
 }
+
 
 
 
