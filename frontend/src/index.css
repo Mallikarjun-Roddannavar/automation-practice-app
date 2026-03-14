@@ -59,6 +59,17 @@
   --app-table-row: rgba(21, 33, 40, 0.92);
 }
 
+.dark .app-bg-orb {
+  border-color: rgba(173, 239, 231, 0.18);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02)),
+    rgba(120, 214, 201, 0.06);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 30px rgba(94, 234, 212, 0.08);
+  opacity: 0.28;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -109,6 +120,63 @@ button {
   isolation: isolate;
 }
 
+.app-bg-orbs {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -2;
+}
+
+.app-bg-orb {
+  position: absolute;
+  bottom: -18vh;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.04)),
+    rgba(255, 255, 255, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 0 28px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  opacity: 0.38;
+  animation: app-float-orb linear infinite;
+}
+
+.app-bg-orb:nth-child(1) {
+  left: 8%;
+  width: 9rem;
+  height: 9rem;
+  animation-duration: 22s;
+  animation-delay: -3s;
+}
+
+.app-bg-orb:nth-child(2) {
+  left: 26%;
+  width: 5.5rem;
+  height: 5.5rem;
+  animation-duration: 17s;
+  animation-delay: -8s;
+}
+
+.app-bg-orb:nth-child(3) {
+  right: 18%;
+  width: 11rem;
+  height: 11rem;
+  animation-duration: 25s;
+  animation-delay: -5s;
+}
+
+.app-bg-orb:nth-child(4) {
+  right: 6%;
+  width: 6.75rem;
+  height: 6.75rem;
+  animation-duration: 19s;
+  animation-delay: -11s;
+}
+
 #root::before,
 #root::after {
   content: "";
@@ -136,6 +204,27 @@ button {
   height: 20rem;
   border-radius: 9999px;
   background: rgba(234, 146, 34, 0.14);
+}
+
+@keyframes app-float-orb {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.92);
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 0.26;
+  }
+
+  48% {
+    transform: translate3d(1.6rem, -32vh, 0) scale(1);
+    opacity: 0.38;
+  }
+
+  100% {
+    transform: translate3d(-1.2rem, -110vh, 0) scale(1.08);
+    opacity: 0;
+  }
 }
 
 h1,
@@ -681,26 +770,45 @@ table {
 }
 
 .btn-primary {
-  border-color: rgba(8, 70, 66, 0.28);
-  background: linear-gradient(180deg, #176d64, #0f5b55);
-  color: #f7fbfa;
-  box-shadow: 0 10px 22px rgba(15, 93, 87, 0.18);
+  border-color: color-mix(in srgb, var(--app-accent) 38%, var(--app-border) 62%);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.08)),
+    color-mix(in srgb, var(--app-secondary) 58%, var(--app-accent-soft) 42%);
+  color: var(--app-accent-strong);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.38),
+    0 10px 22px rgba(15, 118, 110, 0.12);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(180deg, #1a786e, #11534e);
-  box-shadow: 0 14px 26px rgba(15, 93, 87, 0.22);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0.1)),
+    color-mix(in srgb, var(--app-secondary-hover) 54%, var(--app-accent-soft) 46%);
+  border-color: color-mix(in srgb, var(--app-accent) 48%, var(--app-border-strong) 52%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    0 12px 24px rgba(15, 118, 110, 0.16);
 }
 
 .dark .btn-primary {
-  border-color: rgba(113, 214, 196, 0.18);
-  background: linear-gradient(180deg, #1a7f73, #145f56);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24);
+  border-color: color-mix(in srgb, var(--app-accent) 42%, var(--app-border) 58%);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02)),
+    color-mix(in srgb, var(--app-secondary) 72%, var(--app-accent-soft) 28%);
+  color: var(--app-accent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 10px 24px rgba(0, 0, 0, 0.24);
 }
 
 .dark .btn-primary:hover {
-  background: linear-gradient(180deg, #219181, #17685f);
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.28);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03)),
+    color-mix(in srgb, var(--app-secondary-hover) 68%, var(--app-accent-soft) 32%);
+  border-color: color-mix(in srgb, var(--app-accent) 52%, var(--app-border-strong) 48%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 12px 26px rgba(0, 0, 0, 0.26);
 }
 
 .btn-secondary,
@@ -853,5 +961,9 @@ input[type="checkbox"] {
     width: min(19rem, calc(100vw - 2rem));
   }
 }
+
+
+
+
 
 

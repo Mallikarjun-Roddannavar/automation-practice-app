@@ -17,42 +17,51 @@ export default function App() {
   const { user } = useAuth();
 
   return (
-    <Routes>
-      <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
-      <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
-      <Route
-        path="/"
-        element={
-          <PrivateRoute>
-            <HomePage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/folders"
-        element={
-          <PrivateRoute>
-            <FoldersPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/folders/:folderId"
-        element={
-          <PrivateRoute>
-            <FilesPage />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/preferences"
-        element={
-          <PrivateRoute>
-            <PreferencesPage />
-          </PrivateRoute>
-        }
-      />
-      <Route path="*" element={<Navigate to={user ? "/" : "/login"} replace />} />
-    </Routes>
+    <>
+      <div className="app-bg-orbs" aria-hidden="true">
+        <span className="app-bg-orb" />
+        <span className="app-bg-orb" />
+        <span className="app-bg-orb" />
+        <span className="app-bg-orb" />
+      </div>
+      <Routes>
+        <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
+        <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <HomePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/folders"
+          element={
+            <PrivateRoute>
+              <FoldersPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/folders/:folderId"
+          element={
+            <PrivateRoute>
+              <FilesPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/preferences"
+          element={
+            <PrivateRoute>
+              <PreferencesPage />
+            </PrivateRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to={user ? "/" : "/login"} replace />} />
+      </Routes>
+    </>
   );
 }
+
