@@ -49,6 +49,11 @@ Frontend-specific instructions for `playwright-practice-app/frontend`.
   - premium glassmorphic shell for header, sidebar, menus, and top-level chrome
   - clearer work surfaces for forms, dialogs, and data-heavy screens
   - denser, readable tables and crisp primary actions
+- Home page styling direction to preserve:
+  - app-focused dashboard content, not product-marketing copy and not internal automation-framework copy
+  - cinematic motion should come from shared CSS in `src/index.css`, not ad hoc inline styles
+  - scroll, wheel, and pointer effects should stay subtle, premium, and secondary to readability
+  - reveal/hover motion should enhance existing cards and sections instead of introducing new floating panels unless explicitly requested
 - Avoid ad hoc button variants, social-feed layouts, and heavy neumorphic treatment for primary actions.
 
 ## Verification commands

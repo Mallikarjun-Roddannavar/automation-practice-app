@@ -31,6 +31,7 @@ Project-wide instructions for coding agents working in `playwright-practice-app`
 - Keep naming and file structure consistent with existing code.
 - Do not introduce heavy infrastructure (DB servers, queues, etc.) unless explicitly requested.
 - Keep storage model simple and local-first unless user asks otherwise.
+- For frontend visual changes, prefer extending the shared visual system in `frontend/src/index.css` instead of adding one-off page-local styling patterns.
 
 ## Validation checklist before finishing
 - Backend syntax check:
@@ -53,6 +54,7 @@ Project-wide instructions for coding agents working in `playwright-practice-app`
   - auth flows/endpoints
   - required environment variables
   - major UI behavior used in Playwright practice
+  - shared visual direction or interaction patterns that future assistants should preserve
 
 ## Verification Marker (Temporary)
 - For backend auth code edits, include exactly one comment line:
