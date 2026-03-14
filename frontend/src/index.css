@@ -2128,3 +2128,437 @@ input[type="checkbox"] {
 
 
 
+
+.app-home-page {
+  position: relative;
+  gap: 1.3rem;
+}
+
+.app-home-page::before {
+  content: "";
+  position: absolute;
+  inset: 2rem 0 auto;
+  height: 20rem;
+  background:
+    radial-gradient(circle at 18% 22%, color-mix(in srgb, var(--app-accent-soft) 82%, transparent 18%), transparent 34%),
+    radial-gradient(circle at 85% 8%, rgba(244, 158, 76, 0.14), transparent 28%);
+  filter: blur(28px);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.app-home-bento {
+  position: relative;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 0.95fr);
+  grid-template-areas:
+    "hero stats"
+    "hero practice"
+    "quality practice";
+  perspective: 1400px;
+}
+
+.app-home-hero,
+.app-home-tile {
+  min-height: 100%;
+  border-color: color-mix(in srgb, var(--app-accent-soft) 30%, var(--app-border) 70%);
+  box-shadow:
+    0 24px 48px rgba(14, 22, 30, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+  transition:
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 260ms ease,
+    border-color 220ms ease,
+    filter 260ms ease;
+}
+
+.app-home-hero {
+  grid-area: hero;
+  padding: 1.5rem;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--app-panel) 76%, white 24%), color-mix(in srgb, var(--app-panel-strong) 94%, transparent 6%)),
+    radial-gradient(circle at top right, color-mix(in srgb, var(--app-accent-soft) 60%, transparent 40%), transparent 44%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 42%);
+}
+
+.dark .app-home-hero {
+  background:
+    linear-gradient(145deg, rgba(18, 29, 35, 0.96), rgba(10, 17, 24, 0.99)),
+    radial-gradient(circle at top right, rgba(94, 234, 212, 0.18), transparent 42%),
+    radial-gradient(circle at bottom left, rgba(56, 189, 248, 0.1), transparent 38%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 46%);
+}
+
+.app-home-hero::before,
+.app-home-tile::before {
+  opacity: 1;
+}
+
+.app-home-hero::after,
+.app-home-tile::after {
+  opacity: 1;
+}
+
+.app-home-hero::before {
+  inset: -10% auto auto 58%;
+  width: 20rem;
+  height: 20rem;
+  background: radial-gradient(circle, color-mix(in srgb, var(--app-accent) 24%, transparent 76%), transparent 68%);
+  filter: blur(24px);
+  animation: app-home-glow-float 10s ease-in-out infinite;
+}
+
+.app-home-hero::after {
+  background:
+    linear-gradient(118deg, transparent 0%, rgba(255, 255, 255, 0.08) 36%, transparent 58%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 34%);
+  filter: blur(8px);
+}
+
+.app-home-tile::before {
+  inset: auto auto -18% -10%;
+  width: 12rem;
+  height: 12rem;
+  filter: blur(20px);
+  opacity: 0.72;
+}
+
+.app-home-tile::after {
+  background:
+    linear-gradient(125deg, rgba(255, 255, 255, 0.05), transparent 42%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 32%);
+}
+
+.app-home-hero-copy {
+  position: relative;
+  max-width: 38rem;
+}
+
+.app-home-hero-title {
+  margin: 0.8rem 0 0;
+  max-width: 13ch;
+  font-size: clamp(2.2rem, 4.2vw, 3.7rem);
+  line-height: 0.92;
+  font-weight: 800;
+  letter-spacing: -0.07em;
+  text-shadow: 0 10px 28px rgba(15, 118, 110, 0.14);
+}
+
+.dark .app-home-hero-title {
+  text-shadow: 0 12px 34px rgba(94, 234, 212, 0.16);
+}
+
+.app-home-hero-text {
+  margin-top: 1rem;
+  max-width: 42rem;
+  font-size: 0.98rem;
+}
+
+.app-home-signal-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.app-home-signal-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.45rem;
+  overflow: hidden;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb, var(--app-accent-soft) 46%, var(--app-border) 54%);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05)),
+    color-mix(in srgb, var(--app-surface-strong) 72%, white 28%);
+  padding: 0.58rem 1rem;
+  color: var(--app-text);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    0 18px 34px rgba(15, 118, 110, 0.09);
+}
+
+.app-home-signal-pill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.3) 46%, transparent 62%);
+  transform: translateX(-120%);
+  animation: app-home-shimmer 6.8s ease-in-out infinite;
+}
+
+.dark .app-home-signal-pill {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    rgba(20, 32, 39, 0.8);
+  color: var(--app-accent);
+}
+
+.app-home-role-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin-top: 1.55rem;
+}
+
+.app-home-role-card,
+.app-home-stat-card,
+.app-home-stack-item,
+.app-home-quality-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--app-accent-soft) 30%, var(--app-border) 70%);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.06)),
+    color-mix(in srgb, var(--app-surface-strong) 84%, white 16%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    0 20px 34px rgba(25, 33, 41, 0.08);
+  transition:
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 220ms ease,
+    border-color 220ms ease;
+}
+
+.app-home-role-card::before,
+.app-home-stat-card::before,
+.app-home-stack-item::before,
+.app-home-quality-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(130deg, rgba(255, 255, 255, 0.12), transparent 42%, transparent 58%, rgba(94, 234, 212, 0.05));
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.dark .app-home-role-card,
+.dark .app-home-stat-card,
+.dark .app-home-stack-item,
+.dark .app-home-quality-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)),
+    rgba(18, 29, 35, 0.86);
+}
+
+.app-home-role-card {
+  padding: 1rem;
+}
+
+.app-home-role-label,
+.app-home-stat-label,
+.app-home-quality-title,
+.app-home-stack-title {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.app-home-role-copy,
+.app-home-quality-copy,
+.app-home-stack-copy,
+.app-home-stat-copy {
+  margin: 0.58rem 0 0;
+  font-size: 0.88rem;
+}
+
+.app-home-tile {
+  padding: 1.25rem;
+}
+
+.app-home-stats {
+  grid-area: stats;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--app-panel) 88%, white 12%), color-mix(in srgb, var(--app-panel-strong) 98%, transparent 2%)),
+    radial-gradient(circle at top right, color-mix(in srgb, var(--app-accent-soft) 54%, transparent 46%), transparent 48%);
+}
+
+.dark .app-home-stats {
+  background:
+    linear-gradient(180deg, rgba(17, 27, 33, 0.96), rgba(13, 20, 26, 0.98)),
+    radial-gradient(circle at top right, rgba(94, 234, 212, 0.12), transparent 46%);
+}
+
+.app-home-practice {
+  grid-area: practice;
+}
+
+.app-home-quality {
+  grid-area: quality;
+}
+
+.app-home-tile-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.app-home-meta {
+  color: var(--app-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.app-home-stat-grid,
+.app-home-quality-grid,
+.app-home-stack {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.app-home-stat-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.app-home-stat-card {
+  padding: 1rem;
+}
+
+.app-home-stat-value {
+  margin: 0.7rem 0 0;
+  font-size: clamp(2.4rem, 4vw, 3.4rem);
+  line-height: 0.92;
+  font-weight: 800;
+  letter-spacing: -0.07em;
+}
+
+.app-home-stack-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.95rem;
+  align-items: start;
+  padding: 1rem;
+}
+
+.app-home-stack-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.45rem;
+  height: 2.45rem;
+  border-radius: 0.95rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.04)),
+    color-mix(in srgb, var(--app-accent-soft) 72%, transparent 28%);
+  color: var(--app-accent-strong);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 12px 22px rgba(15, 118, 110, 0.08);
+}
+
+.dark .app-home-stack-index {
+  color: var(--app-accent);
+}
+
+.app-home-quality-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.app-home-quality-card {
+  min-height: 100%;
+  padding: 1rem;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .app-home-hero:hover,
+  .app-home-tile:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--app-accent-soft) 52%, var(--app-border) 48%);
+    box-shadow:
+      0 30px 56px rgba(14, 22, 30, 0.14),
+      0 0 0 1px rgba(94, 234, 212, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    filter: saturate(1.04);
+  }
+
+  .app-home-role-card:hover,
+  .app-home-stat-card:hover,
+  .app-home-stack-item:hover,
+  .app-home-quality-card:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--app-accent-soft) 46%, var(--app-border) 54%);
+    box-shadow:
+      0 24px 38px rgba(15, 118, 110, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  }
+}
+
+@keyframes app-home-glow-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate3d(0.8rem, -0.6rem, 0) scale(1.04);
+  }
+}
+
+@keyframes app-home-shimmer {
+  0%,
+  100% {
+    transform: translateX(-120%);
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 0.45;
+  }
+
+  55% {
+    transform: translateX(135%);
+    opacity: 0.2;
+  }
+}
+
+@media (max-width: 1100px) {
+  .app-home-bento {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "hero"
+      "stats"
+      "practice"
+      "quality";
+  }
+
+  .app-home-role-grid,
+  .app-home-quality-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .app-home-page::before {
+    opacity: 0.65;
+  }
+
+  .app-home-hero-title {
+    max-width: none;
+  }
+
+  .app-home-stat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .app-home-tile-head {
+    align-items: start;
+    flex-direction: column;
+  }
+}
