@@ -29,50 +29,63 @@ export function HomePage() {
               Dashboard
             </h2>
             <p className="text-muted mt-2 text-sm">
-              A sharper workspace for role-based validation, storage visibility, and realistic
-              automation practice flows.
+              Practice folder, file, and role-based flows from one central dashboard.
             </p>
           </div>
-          <div className="app-status-chip">Bento workspace overview</div>
+          <div className="app-status-chip">Workspace overview</div>
         </div>
 
         <div className="app-home-bento">
           <section className="app-workspace app-home-hero" data-testid="home-overview-card">
             <div className="app-home-hero-copy">
-              <p className="app-kicker">Automation Focus</p>
+              <p className="app-kicker">Workspace</p>
               <h3 className="app-home-hero-title">
-                Validate UI and API behavior from one clean, role-aware workspace.
+                Use this space to practice folders, files, permissions, and navigation.
               </h3>
               <p className="text-muted app-home-hero-text">
-                This app is structured for realistic Playwright practice: stable selectors,
-                role-based permissions, deep-link coverage, uploads, downloads, dialogs, and
-                predictable cleanup paths.
+                Explore the app with different roles, work with folders and files, and observe how
+                available actions change across the main screens.
               </p>
-            </div>
 
-            <div className="app-home-signal-row" data-testid="home-signal-row">
-              <div className="app-home-signal-pill">Stable test IDs</div>
-              <div className="app-home-signal-pill">RBAC validation</div>
-              <div className="app-home-signal-pill">UI + API coverage</div>
+              <div className="app-home-signal-row" data-testid="home-signal-row">
+                <div className="app-home-signal-pill">Folders</div>
+                <div className="app-home-signal-pill">Files</div>
+                <div className="app-home-signal-pill">Roles</div>
+              </div>
+
+              <div className="app-home-overview-grid">
+                <div className="app-home-overview-card">
+                  <span className="app-home-overview-label">Signed in as</span>
+                  <span className="app-home-overview-value">{user?.username ?? "Guest"}</span>
+                </div>
+                <div className="app-home-overview-card">
+                  <span className="app-home-overview-label">Current role</span>
+                  <span className="app-home-overview-value role-capitalize">{user?.role ?? "guest"}</span>
+                </div>
+                <div className="app-home-overview-card">
+                  <span className="app-home-overview-label">Main areas</span>
+                  <span className="app-home-overview-value">Folders and Files</span>
+                </div>
+              </div>
             </div>
 
             <div className="app-home-role-grid">
               <div className="app-home-role-card">
                 <p className="app-home-role-label">Admin</p>
                 <p className="app-home-role-copy">
-                  Full create, edit, upload, and delete coverage for complete path validation.
+                  Full control across folders and files, including delete operations.
                 </p>
               </div>
               <div className="app-home-role-card">
                 <p className="app-home-role-label">Editor</p>
                 <p className="app-home-role-copy">
-                  Productive authoring flows without destructive access, ideal for boundary checks.
+                  Can create, edit, and upload content without destructive delete access.
                 </p>
               </div>
               <div className="app-home-role-card">
                 <p className="app-home-role-label">Viewer</p>
                 <p className="app-home-role-copy">
-                  Read-only visibility and navigation paths for negative and permission testing.
+                  Read-only access for browsing folders, files, and shared workspace data.
                 </p>
               </div>
             </div>
@@ -92,77 +105,64 @@ export function HomePage() {
                 <p className="app-home-stat-value" data-testid="stats-total-folders">
                   {loading ? "..." : stats.totalFolders}
                 </p>
-                <p className="text-muted app-home-stat-copy">Current folder inventory</p>
+                <p className="text-muted app-home-stat-copy">Folders currently available</p>
+                <div className="app-home-stat-meter" aria-hidden="true">
+                  <span className="app-home-stat-meter-bar is-strong" />
+                  <span className="app-home-stat-meter-bar is-mid" />
+                  <span className="app-home-stat-meter-bar is-soft" />
+                </div>
               </div>
               <div className="app-home-stat-card" data-testid="stats-files-card">
                 <p className="app-home-stat-label">Files</p>
                 <p className="app-home-stat-value" data-testid="stats-total-files">
                   {loading ? "..." : stats.totalFiles}
                 </p>
-                <p className="text-muted app-home-stat-copy">Stored file surface</p>
+                <p className="text-muted app-home-stat-copy">Files stored across the workspace</p>
+                <div className="app-home-stat-meter" aria-hidden="true">
+                  <span className="app-home-stat-meter-bar is-strong" />
+                  <span className="app-home-stat-meter-bar is-mid" />
+                  <span className="app-home-stat-meter-bar is-soft" />
+                </div>
               </div>
+            </div>
+            <div className="app-home-stat-footer" aria-hidden="true">
+              <span className="app-home-stat-footer-line" />
+              <span className="app-home-stat-footer-line is-short" />
             </div>
           </section>
 
           <section className="app-workspace app-home-tile app-home-practice">
             <div className="app-home-tile-head">
-              <p className="app-kicker">Practice Paths</p>
-              <span className="app-home-meta">Common scenarios</span>
+              <p className="app-kicker">Key Flows</p>
+              <span className="app-home-meta">Common actions</span>
             </div>
             <div className="app-home-stack">
               <div className="app-home-stack-item">
                 <span className="app-home-stack-index">01</span>
                 <div>
-                  <p className="app-home-stack-title">Folder and file CRUD</p>
+                  <p className="app-home-stack-title">Create and organize folders</p>
                   <p className="text-muted app-home-stack-copy">
-                    Exercise dialogs, updates, uploads, and role-based restrictions.
+                    Set up folder structures that keep content tidy and easy to browse.
                   </p>
                 </div>
               </div>
               <div className="app-home-stack-item">
                 <span className="app-home-stack-index">02</span>
                 <div>
-                  <p className="app-home-stack-title">Auth and navigation</p>
+                  <p className="app-home-stack-title">Upload and manage files</p>
                   <p className="text-muted app-home-stack-copy">
-                    Cover sign-in, preferences, callback routes, and protected access.
+                    Add files into the right folder and work with them based on your permissions.
                   </p>
                 </div>
               </div>
               <div className="app-home-stack-item">
                 <span className="app-home-stack-index">03</span>
                 <div>
-                  <p className="app-home-stack-title">RBAC boundary checks</p>
+                  <p className="app-home-stack-title">Move through protected areas</p>
                   <p className="text-muted app-home-stack-copy">
-                    Compare admin, editor, and viewer visibility against backend rules.
+                    Navigate confidently knowing the interface adapts to the role you signed in with.
                   </p>
                 </div>
-              </div>
-            </div>
-          </section>
-
-          <section className="app-workspace app-home-tile app-home-quality">
-            <div className="app-home-tile-head">
-              <p className="app-kicker">Quality Signals</p>
-              <span className="app-home-meta">Why it works</span>
-            </div>
-            <div className="app-home-quality-grid">
-              <div className="app-home-quality-card">
-                <p className="app-home-quality-title">Selector hygiene</p>
-                <p className="text-muted app-home-quality-copy">
-                  Stable `data-testid` attributes keep UI automation maintainable.
-                </p>
-              </div>
-              <div className="app-home-quality-card">
-                <p className="app-home-quality-title">Deep-link coverage</p>
-                <p className="text-muted app-home-quality-copy">
-                  Direct folder routes help exercise state restoration and navigation logic.
-                </p>
-              </div>
-              <div className="app-home-quality-card">
-                <p className="app-home-quality-title">Shared behavior surface</p>
-                <p className="text-muted app-home-quality-copy">
-                  The same environment supports UI, API, and mixed validation paths.
-                </p>
               </div>
             </div>
           </section>
