@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -12,6 +12,7 @@ import type { Folder } from "../types";
 export function FoldersPage() {
   const navigate = useNavigate();
   const { user, canCreateEdit, canDelete, isViewer } = useAuth();
+  const [viewMode, setViewMode] = useState<"list" | "cards">("list");
   const [folders, setFolders] = useState<Folder[]>([]);
   const [loading, setLoading] = useState(false);
   const [newName, setNewName] = useState("");
@@ -24,6 +25,7 @@ export function FoldersPage() {
   const [submitting, setSubmitting] = useState(false);
   const [selectedFolderIds, setSelectedFolderIds] = useState<string[]>([]);
   const [lastSyncedAt, setLastSyncedAt] = useState<Date | null>(null);
+  const folderCardRefs = useRef<Record<string, HTMLElement | null>>({});
 
   const emptyState = useMemo(() => !loading && folders.length === 0, [folders.length, loading]);
 
@@ -130,10 +132,45 @@ export function FoldersPage() {
     }
   }
 
+  function ensureCardActionsVisible(folderId: string) {
+    const card = folderCardRefs.current[folderId];
+    if (!card) return;
+
+    const footer = card.querySelector<HTMLElement>(".app-folder-card-footer");
+    const padding = 28;
+
+    const scrollFooterIntoView = () => {
+      const target = footer ?? card;
+      const rect = target.getBoundingClientRect();
+
+      if (rect.bottom > window.innerHeight - padding) {
+        window.scrollBy({ top: rect.bottom - window.innerHeight + padding, behavior: "smooth" });
+        return;
+      }
+
+      if (rect.top < padding) {
+        window.scrollBy({ top: rect.top - padding, behavior: "smooth" });
+      }
+    };
+
+    window.setTimeout(() => {
+      window.requestAnimationFrame(scrollFooterIntoView);
+    }, 240);
+  }
+
   function toggleFolderSelection(folderId: string) {
-    setSelectedFolderIds((prev) =>
-      prev.includes(folderId) ? prev.filter((id) => id !== folderId) : [...prev, folderId]
-    );
+    setSelectedFolderIds((prev) => {
+      const isSelected = prev.includes(folderId);
+      const nextSelectedFolderIds = isSelected
+        ? prev.filter((id) => id !== folderId)
+        : [...prev, folderId];
+
+      if (!isSelected && viewMode === "cards") {
+        ensureCardActionsVisible(folderId);
+      }
+
+      return nextSelectedFolderIds;
+    });
   }
 
   function toggleAllFolders() {
@@ -142,6 +179,37 @@ export function FoldersPage() {
     } else {
       setSelectedFolderIds(folders.map((f) => f.id));
     }
+  }
+
+  function handleViewModeSelect(event: MouseEvent<HTMLButtonElement>, nextViewMode: "list" | "cards") {
+    setViewMode(nextViewMode);
+    event.currentTarget.blur();
+  }
+
+  function handleFolderCardPointerEnter(folderId: string) {
+    if (viewMode === "cards") {
+      ensureCardActionsVisible(folderId);
+    }
+  }
+
+  function handleFolderCardPointerMove(event: MouseEvent<HTMLElement>) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) * 100;
+    const y = ((event.clientY - rect.top) / rect.height) * 100;
+    const tiltX = ((50 - y) / 50) * 2.4;
+    const tiltY = ((x - 50) / 50) * 3.2;
+
+    event.currentTarget.style.setProperty("--app-card-glow-x", `${x}%`);
+    event.currentTarget.style.setProperty("--app-card-glow-y", `${y}%`);
+    event.currentTarget.style.setProperty("--app-card-tilt-x", `${tiltX.toFixed(2)}deg`);
+    event.currentTarget.style.setProperty("--app-card-tilt-y", `${tiltY.toFixed(2)}deg`);
+  }
+
+  function handleFolderCardPointerLeave(event: MouseEvent<HTMLElement>) {
+    event.currentTarget.style.setProperty("--app-card-glow-x", "72%");
+    event.currentTarget.style.setProperty("--app-card-glow-y", "18%");
+    event.currentTarget.style.setProperty("--app-card-tilt-x", "0deg");
+    event.currentTarget.style.setProperty("--app-card-tilt-y", "0deg");
   }
 
   return (
@@ -159,17 +227,43 @@ export function FoldersPage() {
             </p>
           </div>
           <div className="app-meta-row">
-            <div className="app-status-chip">Role: {user?.role ?? "guest"}</div>
             <div className="app-status-chip">Selected: {selectedFolderIds.length}</div>
           </div>
         </div>
 
-        <div className="app-workspace">
-          <div className="app-toolbar">
+        <div className="app-workspace" data-view-mode={viewMode}>
+          <div className="app-toolbar" data-view-mode={viewMode}>
             <p className="text-muted text-xs" data-testid="folders-last-synced">
               Last synced at: {lastSyncedAt ? lastSyncedAt.toLocaleTimeString() : "--"}
             </p>
             <div className="app-toolbar-group">
+              <div className="app-view-toggle-shell">
+                <span className="app-view-toggle-label">View mode</span>
+                <div className="app-view-toggle" data-view-mode={viewMode} data-testid="folders-view-toggle">
+                  <button
+                    type="button"
+                    className={`btn-secondary app-view-toggle-btn px-3 py-2 text-sm ${
+                      viewMode === "list" ? "app-view-toggle-active" : ""
+                    }`}
+                    onClick={(event) => handleViewModeSelect(event, "list")}
+                    aria-pressed={viewMode === "list"}
+                    data-testid="folders-view-list-btn"
+                  >
+                    List
+                  </button>
+                  <button
+                    type="button"
+                    className={`btn-secondary app-view-toggle-btn px-3 py-2 text-sm ${
+                      viewMode === "cards" ? "app-view-toggle-active" : ""
+                    }`}
+                    onClick={(event) => handleViewModeSelect(event, "cards")}
+                    aria-pressed={viewMode === "cards"}
+                    data-testid="folders-view-cards-btn"
+                  >
+                    Cards
+                  </button>
+                </div>
+              </div>
               <button
                 className="btn-secondary px-4 py-2"
                 onClick={refresh}
@@ -210,92 +304,211 @@ export function FoldersPage() {
             </p>
           )}
 
-          <div className="app-table-wrap">
-            <table className="app-table text-left">
-              <thead className="text-sm">
-                <tr>
-                  <th className="p-3">
+          <div
+            key={viewMode}
+            className={`app-view-stage app-view-stage-${viewMode}`}
+            data-testid={`folders-view-stage-${viewMode}`}
+          >
+            {viewMode === "list" ? (
+              <div className="app-table-wrap">
+                <table className="app-table text-left">
+                  <thead className="text-sm">
+                    <tr>
+                      <th className="p-3">
+                        <input
+                          type="checkbox"
+                          checked={folders.length > 0 && selectedFolderIds.length === folders.length}
+                          onChange={toggleAllFolders}
+                          data-testid="folders-select-all"
+                        />
+                      </th>
+                      <th className="p-3">Name</th>
+                      <th className="p-3">Created</th>
+                      <th className="p-3">Owner</th>
+                      <th className="p-3">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {folders.map((folder, index) => (
+                      <tr key={folder.id} data-testid={`folder-row-${index + 1}`}>
+                        <td className="p-3">
+                          <input
+                            type="checkbox"
+                            checked={selectedFolderIds.includes(folder.id)}
+                            onChange={() => toggleFolderSelection(folder.id)}
+                            data-testid={`folder-select-${folder.id}`}
+                          />
+                        </td>
+                        <td className="p-3">{folder.name}</td>
+                        <td className="p-3">{new Date(folder.createdAt).toLocaleString()}</td>
+                        <td className="p-3">{folder.owner}</td>
+                        <td className="p-3">
+                          <div className="app-row-actions">
+                            <button
+                              className="btn-secondary px-3 py-2 disabled:opacity-60"
+                              onClick={() => navigate(`/folders/${folder.id}`)}
+                              disabled={!selectedFolderIds.includes(folder.id)}
+                              data-testid={`folder-open-btn-${folder.id}`}
+                            >
+                              Open
+                            </button>
+                            <a
+                              className={`btn-secondary px-3 py-2 ${
+                                !selectedFolderIds.includes(folder.id)
+                                  ? "pointer-events-none opacity-60"
+                                  : ""
+                              }`}
+                              href={`/folders/${folder.id}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              data-testid={`folder-open-new-tab-${folder.id}`}
+                            >
+                              Open in New Tab
+                            </a>
+                            <button
+                              className="btn-secondary px-3 py-2 disabled:opacity-60"
+                              onClick={() => {
+                                setEditingFolder(folder);
+                                setNewName(folder.name);
+                              }}
+                              disabled={!canCreateEdit || !selectedFolderIds.includes(folder.id)}
+                              data-testid={`folder-rename-btn-${folder.id}`}
+                            >
+                              Rename
+                            </button>
+                            {!isViewer && (
+                              <button
+                                className="btn-danger px-3 py-2 disabled:opacity-60"
+                                onClick={() => setDeletingFolder(folder)}
+                                disabled={!canDelete || !selectedFolderIds.includes(folder.id)}
+                                data-testid={`folder-delete-btn-${folder.id}`}
+                              >
+                                Delete
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {emptyState && (
+                  <p className="app-empty-state" data-testid="folders-empty">
+                    No folders yet.
+                  </p>
+                )}
+              </div>
+            ) : (
+              <>
+                <div className="app-card-grid-header">
+                  <label className="app-card-grid-select-all">
                     <input
                       type="checkbox"
                       checked={folders.length > 0 && selectedFolderIds.length === folders.length}
                       onChange={toggleAllFolders}
                       data-testid="folders-select-all"
                     />
-                  </th>
-                  <th className="p-3">Name</th>
-                  <th className="p-3">Created</th>
-                  <th className="p-3">Owner</th>
-                  <th className="p-3">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {folders.map((folder, index) => (
-                  <tr key={folder.id} data-testid={`folder-row-${index + 1}`}>
-                    <td className="p-3">
-                      <input
-                        type="checkbox"
-                        checked={selectedFolderIds.includes(folder.id)}
-                        onChange={() => toggleFolderSelection(folder.id)}
-                        data-testid={`folder-select-${folder.id}`}
-                      />
-                    </td>
-                    <td className="p-3">{folder.name}</td>
-                    <td className="p-3">{new Date(folder.createdAt).toLocaleString()}</td>
-                    <td className="p-3">{folder.owner}</td>
-                    <td className="p-3">
-                      <div className="app-row-actions">
-                        <button
-                          className="btn-secondary px-3 py-2 disabled:opacity-60"
-                          onClick={() => navigate(`/folders/${folder.id}`)}
-                          disabled={!selectedFolderIds.includes(folder.id)}
-                          data-testid={`folder-open-btn-${folder.id}`}
-                        >
-                          Open
-                        </button>
-                        <a
-                          className={`btn-secondary px-3 py-2 ${
-                            !selectedFolderIds.includes(folder.id)
-                              ? "pointer-events-none opacity-60"
-                              : ""
-                          }`}
-                          href={`/folders/${folder.id}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          data-testid={`folder-open-new-tab-${folder.id}`}
-                        >
-                          Open in New Tab
-                        </a>
-                        <button
-                          className="btn-secondary px-3 py-2 disabled:opacity-60"
-                          onClick={() => {
-                            setEditingFolder(folder);
-                            setNewName(folder.name);
-                          }}
-                          disabled={!canCreateEdit || !selectedFolderIds.includes(folder.id)}
-                          data-testid={`folder-rename-btn-${folder.id}`}
-                        >
-                          Rename
-                        </button>
-                        {!isViewer && (
-                          <button
-                            className="btn-danger px-3 py-2 disabled:opacity-60"
-                            onClick={() => setDeletingFolder(folder)}
-                            disabled={!canDelete || !selectedFolderIds.includes(folder.id)}
-                            data-testid={`folder-delete-btn-${folder.id}`}
-                          >
-                            Delete
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {emptyState && (
-              <p className="app-empty-state" data-testid="folders-empty">
-                No folders yet.
-              </p>
+                    <span>Select all folders</span>
+                  </label>
+                </div>
+                <div className="app-folder-grid" data-testid="folders-card-view">
+                  {folders.map((folder, index) => {
+                    const isSelected = selectedFolderIds.includes(folder.id);
+                    return (
+                      <article
+                        key={folder.id}
+                        ref={(element) => {
+                          folderCardRefs.current[folder.id] = element;
+                        }}
+                        className={`app-folder-card ${isSelected ? "app-folder-card-selected" : ""}`}
+                        onMouseEnter={() => handleFolderCardPointerEnter(folder.id)}
+                        onFocus={() => handleFolderCardPointerEnter(folder.id)}
+                        onMouseMove={handleFolderCardPointerMove}
+                        onMouseLeave={handleFolderCardPointerLeave}
+                        data-testid={`folder-row-${index + 1}`}
+                      >
+                        <div className="app-folder-card-head">
+                          <div className="app-folder-card-icon" aria-hidden="true">
+                            <span />
+                          </div>
+                          <label className="app-card-select">
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => toggleFolderSelection(folder.id)}
+                              data-testid={`folder-select-${folder.id}`}
+                            />
+                            <span>{isSelected ? "Selected" : "Select"}</span>
+                          </label>
+                        </div>
+
+                        <div className="app-folder-card-body">
+                          <h3 className="app-folder-card-title">{folder.name}</h3>
+                          <div className="app-folder-card-meta">
+                            <p>
+                              <span className="text-muted">Owner</span>
+                              <strong>{folder.owner}</strong>
+                            </p>
+                            <p>
+                              <span className="text-muted">Created</span>
+                              <strong>{new Date(folder.createdAt).toLocaleString()}</strong>
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="app-folder-card-footer">
+                          <div className="app-folder-card-links">
+                            <button
+                              className="btn-primary px-3 py-2"
+                              onClick={() => navigate(`/folders/${folder.id}`)}
+                              data-testid={`folder-open-btn-${folder.id}`}
+                            >
+                              Open
+                            </button>
+                            <a
+                              className="btn-secondary px-3 py-2"
+                              href={`/folders/${folder.id}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              data-testid={`folder-open-new-tab-${folder.id}`}
+                            >
+                              New Tab
+                            </a>
+                          </div>
+                          <div className="app-row-actions">
+                            <button
+                              className="btn-secondary px-3 py-2 disabled:opacity-60"
+                              onClick={() => {
+                                setEditingFolder(folder);
+                                setNewName(folder.name);
+                              }}
+                              disabled={!canCreateEdit}
+                              data-testid={`folder-rename-btn-${folder.id}`}
+                            >
+                              Rename
+                            </button>
+                            {!isViewer && (
+                              <button
+                                className="btn-danger px-3 py-2 disabled:opacity-60"
+                                onClick={() => setDeletingFolder(folder)}
+                                disabled={!canDelete}
+                                data-testid={`folder-delete-btn-${folder.id}`}
+                              >
+                                Delete
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+                {emptyState && (
+                  <p className="app-empty-state" data-testid="folders-empty">
+                    No folders yet.
+                  </p>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -381,4 +594,12 @@ export function FoldersPage() {
     </AppLayout>
   );
 }
+
+
+
+
+
+
+
+
 

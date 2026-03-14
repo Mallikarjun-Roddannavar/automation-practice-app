@@ -450,8 +450,72 @@ table {
 }
 
 .app-workspace {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
   border-radius: 1.6rem;
   padding: 1.15rem;
+}
+
+.app-workspace > * {
+  position: relative;
+  z-index: 1;
+}
+
+.app-workspace::before,
+.app-workspace::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    opacity 320ms ease,
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 320ms ease;
+}
+
+.app-workspace::before {
+  inset: -12% -8% auto auto;
+  width: 18rem;
+  height: 18rem;
+  border-radius: 9999px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--app-accent) 18%, transparent 82%), transparent 70%);
+  filter: blur(18px);
+  transform: translate3d(0, -0.75rem, 0) scale(0.92);
+}
+
+.app-workspace::after {
+  inset: 0;
+  background:
+    linear-gradient(120deg, transparent 0%, color-mix(in srgb, var(--app-accent-soft) 18%, transparent 82%) 46%, transparent 68%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 34%);
+  transform: translate3d(-4%, 0, 0) scale(1.02);
+  filter: blur(10px);
+}
+
+.app-workspace[data-view-mode="cards"]::before,
+.app-workspace[data-view-mode="cards"]::after {
+  opacity: 1;
+}
+
+.app-workspace[data-view-mode="cards"]::before {
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.app-workspace[data-view-mode="cards"]::after {
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.app-workspace[data-view-mode="list"]::before {
+  inset: auto auto -20% -10%;
+  transform: translate3d(0, 0.75rem, 0) scale(0.94);
+}
+
+.app-workspace[data-view-mode="list"]::after {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--app-accent-soft) 12%, transparent 88%), transparent 30%),
+    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
 }
 
 .app-dialog-panel {
@@ -462,11 +526,39 @@ table {
 }
 
 .app-toolbar {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 0.85rem;
+  transition:
+    transform 240ms ease,
+    filter 240ms ease,
+    box-shadow 240ms ease;
+}
+
+.app-toolbar::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 -0.35rem;
+  height: 1.25rem;
+  background: radial-gradient(circle at center, color-mix(in srgb, var(--app-accent) 16%, transparent 84%), transparent 72%);
+  filter: blur(14px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 240ms ease, transform 240ms ease;
+  transform: scaleX(0.82);
+}
+
+.app-toolbar[data-view-mode="cards"] {
+  transform: translateY(-1px);
+  filter: saturate(1.02);
+}
+
+.app-toolbar[data-view-mode="cards"]::after {
+  opacity: 0.95;
+  transform: scaleX(1);
 }
 
 .app-toolbar-group {
@@ -559,6 +651,20 @@ table {
     box-shadow 140ms ease;
 }
 
+.app-view-stage-list .app-table tbody tr {
+  opacity: 0;
+  animation: app-table-row-enter 320ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.app-view-stage-list .app-table tbody tr:nth-child(1) { animation-delay: 30ms; }
+.app-view-stage-list .app-table tbody tr:nth-child(2) { animation-delay: 70ms; }
+.app-view-stage-list .app-table tbody tr:nth-child(3) { animation-delay: 110ms; }
+.app-view-stage-list .app-table tbody tr:nth-child(4) { animation-delay: 150ms; }
+.app-view-stage-list .app-table tbody tr:nth-child(5) { animation-delay: 190ms; }
+.app-view-stage-list .app-table tbody tr:nth-child(6) { animation-delay: 230ms; }
+.app-view-stage-list .app-table tbody tr:nth-child(7) { animation-delay: 270ms; }
+.app-view-stage-list .app-table tbody tr:nth-child(8) { animation-delay: 310ms; }
+
 .app-table tbody tr:nth-child(even) {
   background: color-mix(in srgb, var(--app-table-row) 84%, transparent 16%);
 }
@@ -590,6 +696,794 @@ table {
   padding: 1rem 0.25rem 0.25rem;
   color: var(--app-muted);
   font-size: 0.95rem;
+}
+
+.app-view-toggle-shell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.35rem 0.45rem 0.35rem 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--app-accent-soft) 55%, var(--app-border) 45%);
+  border-radius: 9999px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--app-surface-strong) 88%, white 12%), transparent),
+    color-mix(in srgb, var(--app-panel-strong) 78%, var(--app-accent-soft) 22%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.34),
+    0 14px 30px rgba(15, 118, 110, 0.08);
+  overflow: hidden;
+  transition:
+    border-color 180ms ease,
+    box-shadow 220ms ease,
+    transform 180ms ease,
+    background-color 220ms ease;
+}
+
+.app-view-toggle-shell::before {
+  content: "";
+  position: absolute;
+  inset: -45% auto auto -12%;
+  width: 6rem;
+  height: 6rem;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--app-accent) 22%, transparent 78%);
+  filter: blur(20px);
+  opacity: 0.52;
+  transition: transform 260ms ease, opacity 260ms ease;
+  pointer-events: none;
+}
+
+.app-view-toggle-shell:hover,
+.app-view-toggle-shell:focus-within {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--app-accent) 38%, var(--app-border-strong) 62%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    0 18px 36px rgba(15, 118, 110, 0.12),
+    0 0 24px color-mix(in srgb, var(--app-accent) 16%, transparent 84%);
+}
+
+.app-view-toggle-shell:hover::before,
+.app-view-toggle-shell:focus-within::before {
+  transform: translate3d(1.5rem, 0.2rem, 0);
+  opacity: 0.8;
+}
+
+.app-view-toggle-label {
+  position: relative;
+  z-index: 1;
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--app-muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateX(-0.35rem);
+  transition:
+    max-width 240ms ease,
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.app-view-toggle-shell:hover .app-view-toggle-label,
+.app-view-toggle-shell:focus-within .app-view-toggle-label {
+  max-width: 7rem;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.app-view-toggle {
+  --app-view-rail-x: 0%;
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem;
+  border: 1px solid color-mix(in srgb, var(--app-accent-soft) 50%, var(--app-border) 50%);
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--app-surface-strong) 72%, white 28%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.34);
+  overflow: hidden;
+}
+
+.app-view-toggle[data-view-mode="cards"] {
+  --app-view-rail-x: calc(100% + 0.4rem);
+}
+
+.app-view-toggle::before,
+.app-view-toggle::after {
+  content: "";
+  position: absolute;
+  left: 0.25rem;
+  width: calc(50% - 0.45rem);
+  border-radius: 9999px;
+  transform: translateX(var(--app-view-rail-x));
+  transition:
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 220ms ease;
+  pointer-events: none;
+}
+
+.app-view-toggle::before {
+  bottom: 0.18rem;
+  height: 0.28rem;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), color-mix(in srgb, var(--app-accent) 82%, white 18%), rgba(255, 255, 255, 0) 42%, rgba(255, 255, 255, 0.96) 50%, rgba(255, 255, 255, 0) 58%, color-mix(in srgb, var(--app-accent) 82%, white 18%), rgba(255, 255, 255, 0));
+  background-size: 220% 100%;
+  box-shadow:
+    0 0 12px color-mix(in srgb, var(--app-accent) 48%, transparent 52%),
+    0 0 24px color-mix(in srgb, var(--app-accent) 24%, transparent 76%);
+  opacity: 0.9;
+  animation: app-energy-rail-shimmer 2.6s linear infinite;
+}
+
+.app-view-toggle::after {
+  bottom: 0.55rem;
+  height: 2.35rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.02)),
+    color-mix(in srgb, var(--app-accent-soft) 58%, transparent 42%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 12px 24px color-mix(in srgb, var(--app-accent) 12%, transparent 88%);
+  opacity: 0.78;
+}
+
+.app-view-toggle-btn {
+  position: relative;
+  z-index: 1;
+  min-width: 5rem;
+}
+
+.app-view-toggle-btn:not(.app-view-toggle-active) {
+  opacity: 0.5;
+  transform: scale(0.94);
+  filter: saturate(0.82);
+}
+
+.app-view-toggle-shell:hover .app-view-toggle-btn,
+.app-view-toggle-shell:focus-within .app-view-toggle-btn {
+  opacity: 1;
+  transform: scale(1);
+  filter: none;
+}
+
+.app-view-toggle-active {
+  border-color: color-mix(in srgb, var(--app-accent) 52%, var(--app-border) 48%);
+  background: transparent;
+  color: var(--app-accent-strong);
+  box-shadow: none;
+}
+
+.app-view-stage {
+  margin-top: 1rem;
+  transform-origin: top center;
+  animation: app-view-stage-enter 320ms cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+.app-view-stage-list {
+  animation-name: app-view-stage-list-enter;
+}
+
+.app-view-stage-cards {
+  animation-name: app-view-stage-cards-enter;
+}
+
+.app-card-grid-header {
+  margin-top: 1rem;
+}
+
+.app-card-grid-select-all,
+.app-card-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--app-muted);
+  font-size: 0.9rem;
+}
+
+.app-folder-grid,
+.app-file-grid {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.app-folder-card {
+  --app-card-glow-x: 72%;
+  --app-card-glow-y: 18%;
+  --app-card-tilt-x: 0deg;
+  --app-card-tilt-y: 0deg;
+  --app-card-lift: 0px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 16rem;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  will-change: transform;
+  border: 1px solid var(--app-border);
+  border-radius: 1.35rem;
+  background: linear-gradient(180deg, var(--app-surface-strong), var(--app-panel));
+  padding: 1.1rem;
+  box-shadow: var(--app-shadow-soft);
+  transform:
+    perspective(1000px)
+    translate3d(0, var(--app-card-lift), 0)
+    rotateX(var(--app-card-tilt-x))
+    rotateY(var(--app-card-tilt-y));
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 220ms ease,
+    background-color 220ms ease;
+}
+
+.app-folder-card::before {
+  content: "";
+  position: absolute;
+  top: calc(var(--app-card-glow-y) - 5rem);
+  left: calc(var(--app-card-glow-x) - 5rem);
+  width: 10rem;
+  height: 10rem;
+  border-radius: 9999px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--app-accent) 26%, transparent 74%), transparent 70%);
+  filter: blur(18px);
+  opacity: 0;
+  transform: translateZ(0) scale(0.85);
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease,
+    top 120ms ease-out,
+    left 120ms ease-out;
+  pointer-events: none;
+}
+
+.app-folder-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px transparent;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 24%);
+  transition: box-shadow 220ms ease, background-color 220ms ease;
+  pointer-events: none;
+}
+
+.app-folder-card:hover,
+.app-folder-card:focus-within {
+  --app-card-lift: -5px;
+  border-color: color-mix(in srgb, var(--app-accent) 34%, var(--app-border-strong) 66%);
+  box-shadow:
+    0 24px 44px rgba(16, 24, 40, 0.16),
+    0 0 0 1px color-mix(in srgb, var(--app-accent-soft) 60%, transparent 40%),
+    0 0 32px color-mix(in srgb, var(--app-accent) 20%, transparent 80%);
+}
+
+.app-folder-card:hover::before,
+.app-folder-card:focus-within::before {
+  opacity: 1;
+  transform: translateZ(0) scale(1);
+}
+
+.app-folder-card:hover::after,
+.app-folder-card:focus-within::after {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--app-accent) 18%, transparent 82%);
+}
+
+.app-folder-card:hover .app-folder-card-icon,
+.app-folder-card:focus-within .app-folder-card-icon {
+  transform: translate3d(0, -3px, 18px) rotate(-3deg);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--app-accent) 24%, transparent 76%),
+    0 0 26px color-mix(in srgb, var(--app-accent) 18%, transparent 82%);
+}
+
+.app-folder-card:hover .app-folder-card-icon span,
+.app-folder-card:focus-within .app-folder-card-icon span {
+  animation: app-folder-icon-float 1.7s ease-in-out infinite;
+  transform: translateY(-1px) scale(1.04);
+  filter: saturate(1.08) brightness(1.03);
+}
+
+.app-folder-card-selected {
+  --app-card-lift: -5px;
+  border-color: color-mix(in srgb, var(--app-accent) 58%, var(--app-border) 42%);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--app-accent-soft) 28%, var(--app-surface-strong) 72%), var(--app-panel));
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--app-accent) 22%, transparent 78%),
+    0 28px 52px rgba(16, 24, 40, 0.18),
+    0 0 0 1px color-mix(in srgb, var(--app-accent-soft) 70%, transparent 30%),
+    0 0 40px color-mix(in srgb, var(--app-accent) 24%, transparent 76%);
+}
+
+.app-folder-card-selected::before {
+  opacity: 1;
+  transform: translateZ(0) scale(1);
+}
+
+.app-folder-card-selected::after {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--app-accent) 26%, transparent 74%);
+}
+
+.app-folder-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.app-folder-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--app-accent-soft) 56%, white 44%);
+  border: 1px solid color-mix(in srgb, var(--app-accent) 22%, var(--app-border) 78%);
+  transform: translateZ(20px);
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    border-color 220ms ease,
+    background-color 220ms ease;
+}
+
+.app-folder-card-icon span {
+  position: relative;
+  width: 1.35rem;
+  height: 1rem;
+  border-radius: 0.35rem 0.35rem 0.25rem 0.25rem;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--app-accent-soft) 58%, white 42%), color-mix(in srgb, var(--app-accent) 18%, white 82%));
+  transition: transform 220ms ease, filter 220ms ease;
+}
+
+.app-folder-card-icon span::before {
+  content: "";
+  position: absolute;
+  top: -0.28rem;
+  left: 0.05rem;
+  width: 0.65rem;
+  height: 0.28rem;
+  border-radius: 0.2rem 0.2rem 0 0;
+  background: inherit;
+}
+
+.app-folder-card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.app-folder-card-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.app-folder-card-meta {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.app-folder-card-meta p {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0;
+}
+
+.app-folder-card-meta strong {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.app-folder-card-footer {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: auto;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(0.75rem);
+  pointer-events: none;
+  padding-top: 0;
+  border-top: 1px solid transparent;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease,
+    max-height 220ms ease,
+    padding-top 180ms ease,
+    border-color 180ms ease;
+}
+
+.app-folder-card:hover .app-folder-card-footer,
+.app-folder-card:focus-within .app-folder-card-footer,
+.app-folder-card-selected .app-folder-card-footer {
+  max-height: 10rem;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  padding-top: 0.9rem;
+  border-top-color: var(--app-divider);
+}
+
+.app-folder-card-links,
+.app-folder-card-footer .app-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.app-file-card {
+  --app-card-glow-x: 72%;
+  --app-card-glow-y: 18%;
+  --app-card-tilt-x: 0deg;
+  --app-card-tilt-y: 0deg;
+  --app-card-lift: 0px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 17rem;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  will-change: transform;
+  border: 1px solid var(--app-border);
+  border-radius: 1.35rem;
+  background: linear-gradient(180deg, var(--app-surface-strong), var(--app-panel));
+  padding: 1.1rem;
+  box-shadow: var(--app-shadow-soft);
+  transform:
+    perspective(1000px)
+    translate3d(0, var(--app-card-lift), 0)
+    rotateX(var(--app-card-tilt-x))
+    rotateY(var(--app-card-tilt-y));
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 220ms ease,
+    background-color 220ms ease;
+}
+
+.app-file-card::before {
+  content: "";
+  position: absolute;
+  top: calc(var(--app-card-glow-y) - 5rem);
+  left: calc(var(--app-card-glow-x) - 5rem);
+  width: 10rem;
+  height: 10rem;
+  border-radius: 9999px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--app-accent) 24%, transparent 76%), transparent 70%);
+  filter: blur(18px);
+  opacity: 0;
+  transform: translateZ(0) scale(0.85);
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease,
+    top 120ms ease-out,
+    left 120ms ease-out;
+  pointer-events: none;
+}
+
+.app-file-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px transparent;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 24%);
+  transition: box-shadow 220ms ease, background-color 220ms ease;
+  pointer-events: none;
+}
+
+.app-file-card:hover,
+.app-file-card:focus-within {
+  --app-card-lift: -5px;
+  border-color: color-mix(in srgb, var(--app-accent) 34%, var(--app-border-strong) 66%);
+  box-shadow:
+    0 24px 44px rgba(16, 24, 40, 0.16),
+    0 0 0 1px color-mix(in srgb, var(--app-accent-soft) 60%, transparent 40%),
+    0 0 32px color-mix(in srgb, var(--app-accent) 18%, transparent 82%);
+}
+
+.app-file-card:hover::before,
+.app-file-card:focus-within::before {
+  opacity: 1;
+  transform: translateZ(0) scale(1);
+}
+
+.app-file-card:hover::after,
+.app-file-card:focus-within::after {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--app-accent) 18%, transparent 82%);
+}
+
+.app-file-card-selected {
+  --app-card-lift: -5px;
+  border-color: color-mix(in srgb, var(--app-accent) 58%, var(--app-border) 42%);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--app-accent-soft) 24%, var(--app-surface-strong) 76%), var(--app-panel));
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--app-accent) 22%, transparent 78%),
+    0 28px 52px rgba(16, 24, 40, 0.18),
+    0 0 0 1px color-mix(in srgb, var(--app-accent-soft) 70%, transparent 30%),
+    0 0 40px color-mix(in srgb, var(--app-accent) 22%, transparent 78%);
+}
+
+.app-file-card-selected::before {
+  opacity: 1;
+  transform: translateZ(0) scale(1);
+}
+
+.app-file-card-selected::after {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--app-accent) 26%, transparent 74%);
+}
+
+.app-file-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.app-file-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--app-accent-soft) 52%, white 48%);
+  border: 1px solid color-mix(in srgb, var(--app-accent) 22%, var(--app-border) 78%);
+  transform: translateZ(20px);
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    border-color 220ms ease,
+    background-color 220ms ease;
+}
+
+.app-file-card-icon span {
+  position: relative;
+  width: 1rem;
+  height: 1.25rem;
+  border-radius: 0.2rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.84), color-mix(in srgb, var(--app-accent-soft) 56%, white 44%));
+  box-shadow: inset 0 -0.2rem 0 color-mix(in srgb, var(--app-accent) 16%, transparent 84%);
+  transition: transform 220ms ease, filter 220ms ease;
+}
+
+.app-file-card-icon span::before {
+  content: "";
+  position: absolute;
+  top: 0.15rem;
+  right: 0.12rem;
+  width: 0.25rem;
+  height: 0.25rem;
+  border-top: 1px solid color-mix(in srgb, var(--app-accent) 28%, transparent 72%);
+  border-right: 1px solid color-mix(in srgb, var(--app-accent) 28%, transparent 72%);
+  transform: rotate(45deg);
+  opacity: 0.85;
+}
+
+.app-file-card:hover .app-file-card-icon,
+.app-file-card:focus-within .app-file-card-icon {
+  transform: translate3d(0, -3px, 18px) rotate(3deg);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--app-accent) 24%, transparent 76%),
+    0 0 26px color-mix(in srgb, var(--app-accent) 18%, transparent 82%);
+}
+
+.app-file-card:hover .app-file-card-icon span,
+.app-file-card:focus-within .app-file-card-icon span {
+  animation: app-folder-icon-float 1.7s ease-in-out infinite;
+  transform: translateY(-1px) scale(1.04);
+  filter: saturate(1.08) brightness(1.03);
+}
+
+.app-file-card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.app-file-card-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.app-file-card-meta {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.app-file-card-meta p {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0;
+}
+
+.app-file-card-meta strong {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.app-file-card-footer {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: auto;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(0.75rem);
+  pointer-events: none;
+  padding-top: 0;
+  border-top: 1px solid transparent;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease,
+    max-height 220ms ease,
+    padding-top 180ms ease,
+    border-color 180ms ease;
+}
+
+.app-file-card:hover .app-file-card-footer,
+.app-file-card:focus-within .app-file-card-footer,
+.app-file-card-selected .app-file-card-footer {
+  max-height: 11rem;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  padding-top: 0.9rem;
+  border-top-color: var(--app-divider);
+}
+
+.app-file-card-links,
+.app-file-card-footer .app-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.app-view-stage-cards .app-file-card {
+  opacity: 0;
+  animation: app-folder-card-enter 460ms cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
+}
+
+.app-view-stage-cards .app-file-card:nth-child(1) { animation-delay: 40ms; }
+.app-view-stage-cards .app-file-card:nth-child(2) { animation-delay: 110ms; }
+.app-view-stage-cards .app-file-card:nth-child(3) { animation-delay: 180ms; }
+.app-view-stage-cards .app-file-card:nth-child(4) { animation-delay: 250ms; }
+.app-view-stage-cards .app-file-card:nth-child(5) { animation-delay: 320ms; }
+.app-view-stage-cards .app-file-card:nth-child(6) { animation-delay: 390ms; }
+.app-view-stage-cards .app-file-card:nth-child(7) { animation-delay: 460ms; }
+.app-view-stage-cards .app-file-card:nth-child(8) { animation-delay: 530ms; }
+
+.dark .app-file-card {
+  background: linear-gradient(180deg, var(--app-surface-strong), color-mix(in srgb, var(--app-panel-strong) 86%, transparent 14%));
+}
+
+@keyframes app-view-stage-enter {
+  0% {
+    opacity: 0;
+    transform: perspective(1000px) translate3d(0, 0.85rem, 0) scale(0.985);
+    filter: blur(8px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: perspective(1000px) translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes app-energy-rail-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -20% 0;
+  }
+}
+
+@keyframes app-folder-card-enter {
+  0% {
+    opacity: 0;
+    transform: perspective(1000px) rotateX(8deg) translate3d(0, 1rem, 0) scale(0.96);
+    filter: blur(10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: perspective(1000px) rotateX(0deg) translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes app-folder-icon-float {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+
+  50% {
+    transform: translateY(-2px) scale(1.03);
+  }
+}
+
+@keyframes app-table-row-enter {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0.55rem, 0);
+    filter: blur(6px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    filter: blur(0);
+  }
+}
+
+@keyframes app-view-stage-list-enter {
+  0% {
+    opacity: 0;
+    transform: perspective(1000px) rotateX(-5deg) translate3d(0, 1rem, 0) scale(0.985);
+    filter: blur(8px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: perspective(1000px) rotateX(0deg) translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes app-view-stage-cards-enter {
+  0% {
+    opacity: 0;
+    transform: perspective(1000px) rotateX(6deg) translate3d(0, 1rem, 0) scale(0.975);
+    filter: blur(10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: perspective(1000px) rotateX(0deg) translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.app-view-stage-cards .app-folder-card {
+  opacity: 0;
+  animation: app-folder-card-enter 460ms cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
+}
+
+.app-view-stage-cards .app-folder-card:nth-child(1) { animation-delay: 40ms; }
+.app-view-stage-cards .app-folder-card:nth-child(2) { animation-delay: 110ms; }
+.app-view-stage-cards .app-folder-card:nth-child(3) { animation-delay: 180ms; }
+.app-view-stage-cards .app-folder-card:nth-child(4) { animation-delay: 250ms; }
+.app-view-stage-cards .app-folder-card:nth-child(5) { animation-delay: 320ms; }
+.app-view-stage-cards .app-folder-card:nth-child(6) { animation-delay: 390ms; }
+.app-view-stage-cards .app-folder-card:nth-child(7) { animation-delay: 460ms; }
+.app-view-stage-cards .app-folder-card:nth-child(8) { animation-delay: 530ms; }
+
+.dark .app-folder-card {
+  background: linear-gradient(180deg, var(--app-surface-strong), color-mix(in srgb, var(--app-panel-strong) 86%, transparent 14%));
 }
 
 .app-dialog-header {
@@ -938,6 +1832,61 @@ input[type="checkbox"] {
     width: 100%;
   }
 
+  .app-view-toggle-shell {
+    width: 100%;
+    justify-content: space-between;
+    padding: 0.45rem;
+  }
+
+  .app-view-toggle-label {
+    max-width: 7rem;
+    opacity: 1;
+    transform: none;
+  }
+
+  .app-view-toggle {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .app-view-toggle > * {
+    flex: 1;
+  }
+
+  .app-view-toggle-btn:not(.app-view-toggle-active) {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  .app-folder-card-head {
+    align-items: flex-start;
+  }
+
+  .app-folder-card {
+    --app-card-tilt-x: 0deg;
+    --app-card-tilt-y: 0deg;
+  }
+
+  .app-folder-card-footer {
+    max-height: none;
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    padding-top: 0.9rem;
+    border-top-color: var(--app-divider);
+  }
+
+  .app-folder-card-links,
+  .app-folder-card-footer .app-row-actions {
+    flex-direction: column;
+  }
+
+  .app-folder-card-links > *,
+  .app-folder-card-footer .app-row-actions > * {
+    width: 100%;
+  }
+
   .app-table {
     min-width: 34rem;
   }
@@ -961,6 +1910,19 @@ input[type="checkbox"] {
     width: min(19rem, calc(100vw - 2rem));
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

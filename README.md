@@ -107,7 +107,7 @@ Login page now supports:
 - OAuth redirect login (`Login with OAuth` button)
 
 UI behavior for Playwright practice:
-- Folder rows include `Open in New Tab` links (`target="_blank"`).
+- Folder pages support toggling between list and card views while preserving the same actions and test IDs.`r`n- Folder rows include `Open in New Tab` links (`target="_blank"`).
 - File rows include `Preview` popup button (`window.open`).
 - Folder and File pages support 5-second auto-polling and manual `Refresh` buttons.
 - Toast notifications are enabled via `react-toastify` for async success/error flows.
@@ -209,4 +209,5 @@ npx playwright test --project=api
 - Uses Page Object Model classes under `tests/ui/pom`.
 - Separates API specs from UI specs and uses a shared API client helper.
 - Uses isolated browser contexts per role for parallel-safe multi-user testing.
+
 
