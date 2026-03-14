@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { api } from "../api";
 import { AppLayout } from "../components/AppLayout";
@@ -10,6 +10,8 @@ export function HomePage() {
   const { user } = useAuth();
   const [stats, setStats] = useState<Stats>({ totalFolders: 0, totalFiles: 0 });
   const [loading, setLoading] = useState(false);
+  const homePageRef = useRef<HTMLElement | null>(null);
+  const wheelResetRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -19,9 +21,80 @@ export function HomePage() {
       .finally(() => setLoading(false));
   }, [user]);
 
+  useEffect(() => {
+    const page = homePageRef.current;
+    if (!page) return;
+
+    const updateScrollMotion = () => {
+      const rect = page.getBoundingClientRect();
+      const viewportHeight = window.innerHeight || 1;
+      const progress = Math.max(0, Math.min(1, (viewportHeight - rect.top) / (viewportHeight + rect.height)));
+      const drift = (window.scrollY || 0) * 0.04;
+
+      page.style.setProperty("--app-home-scroll-progress", progress.toFixed(3));
+      page.style.setProperty("--app-home-scroll-shift", `${drift.toFixed(2)}px`);
+      page.style.setProperty("--app-home-scroll-tilt", `${(progress * 6 - 3).toFixed(2)}deg`);
+    };
+
+    const handlePointerMove = (event: PointerEvent) => {
+      const rect = page.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width;
+      const y = (event.clientY - rect.top) / rect.height;
+
+      if (x < 0 || x > 1 || y < 0 || y > 1) {
+        return;
+      }
+
+      page.style.setProperty("--app-home-pointer-x", `${(x * 100).toFixed(2)}%`);
+      page.style.setProperty("--app-home-pointer-y", `${(y * 100).toFixed(2)}%`);
+      page.style.setProperty("--app-home-pointer-tilt-x", `${((0.5 - y) * 8).toFixed(2)}deg`);
+      page.style.setProperty("--app-home-pointer-tilt-y", `${((x - 0.5) * 10).toFixed(2)}deg`);
+    };
+
+    const resetPointerMotion = () => {
+      page.style.setProperty("--app-home-pointer-x", "50%");
+      page.style.setProperty("--app-home-pointer-y", "50%");
+      page.style.setProperty("--app-home-pointer-tilt-x", "0deg");
+      page.style.setProperty("--app-home-pointer-tilt-y", "0deg");
+    };
+
+    const handleWheel = (event: WheelEvent) => {
+      const intensity = Math.max(-1, Math.min(1, event.deltaY / 140));
+      page.style.setProperty("--app-home-wheel-impulse", intensity.toFixed(3));
+
+      if (wheelResetRef.current !== null) {
+        window.clearTimeout(wheelResetRef.current);
+      }
+
+      wheelResetRef.current = window.setTimeout(() => {
+        page.style.setProperty("--app-home-wheel-impulse", "0");
+        wheelResetRef.current = null;
+      }, 180);
+    };
+
+    updateScrollMotion();
+    resetPointerMotion();
+    page.style.setProperty("--app-home-wheel-impulse", "0");
+
+    window.addEventListener("scroll", updateScrollMotion, { passive: true });
+    page.addEventListener("pointermove", handlePointerMove);
+    page.addEventListener("pointerleave", resetPointerMotion);
+    page.addEventListener("wheel", handleWheel, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", updateScrollMotion);
+      page.removeEventListener("pointermove", handlePointerMove);
+      page.removeEventListener("pointerleave", resetPointerMotion);
+      page.removeEventListener("wheel", handleWheel);
+      if (wheelResetRef.current !== null) {
+        window.clearTimeout(wheelResetRef.current);
+      }
+    };
+  }, []);
+
   return (
     <AppLayout>
-      <section className="app-page app-home-page">
+      <section ref={homePageRef} className="app-page app-home-page">
         <div className="app-section-head">
           <div className="app-section-copy">
             <p className="app-kicker">Overview</p>
@@ -40,11 +113,11 @@ export function HomePage() {
             <div className="app-home-hero-copy">
               <p className="app-kicker">Workspace</p>
               <h3 className="app-home-hero-title">
-                Use this space to practice folders, files, permissions, and navigation.
+                Practice folders, files, permissions, and navigation in one place.
               </h3>
               <p className="text-muted app-home-hero-text">
-                Explore the app with different roles, work with folders and files, and observe how
-                available actions change across the main screens.
+                Switch roles, work with folders and files, and observe how available actions change
+                across the app.
               </p>
 
               <div className="app-home-signal-row" data-testid="home-signal-row">
@@ -96,8 +169,8 @@ export function HomePage() {
             data-testid="stats-folders-card"
           >
             <div className="app-home-tile-head">
-              <p className="app-kicker">Live Storage</p>
-              <span className="app-home-meta">Synced summary</span>
+              <p className="app-kicker">Storage</p>
+              <span className="app-home-meta">Current totals</span>
             </div>
             <div className="app-home-stat-grid">
               <div className="app-home-stat-card">
@@ -133,7 +206,7 @@ export function HomePage() {
 
           <section className="app-workspace app-home-tile app-home-practice">
             <div className="app-home-tile-head">
-              <p className="app-kicker">Key Flows</p>
+              <p className="app-kicker">Flows</p>
               <span className="app-home-meta">Common actions</span>
             </div>
             <div className="app-home-stack">
@@ -171,3 +244,4 @@ export function HomePage() {
     </AppLayout>
   );
 }
+
