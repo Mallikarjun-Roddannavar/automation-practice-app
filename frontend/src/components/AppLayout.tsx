@@ -81,7 +81,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             </button>
             {profileOpen && (
               <div
-                className="dropdown-panel absolute right-0 mt-3 w-64 p-4"
+                className="dropdown-panel absolute right-0 top-full z-30 mt-3 w-64 p-4"
                 data-testid="profile-menu"
               >
                 <p className="text-sm font-medium" data-testid="profile-username">

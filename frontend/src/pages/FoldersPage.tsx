@@ -243,7 +243,7 @@ export function FoldersPage() {
                     <td className="p-3">{new Date(folder.createdAt).toLocaleString()}</td>
                     <td className="p-3">{folder.owner}</td>
                     <td className="p-3">
-                      <div className="flex flex-wrap gap-2">
+                      <div className="app-row-actions">
                         <button
                           className="btn-secondary px-3 py-2 disabled:opacity-60"
                           onClick={() => navigate(`/folders/${folder.id}`)}
@@ -381,3 +381,4 @@ export function FoldersPage() {
     </AppLayout>
   );
 }
+
