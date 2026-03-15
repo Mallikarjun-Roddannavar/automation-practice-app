@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import mimetypes
 import re
@@ -52,6 +53,7 @@ UPLOADS_DIR = BASE_DIR / "uploads"
 UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 
 STORE_LOCK = Lock()
+logger = logging.getLogger("uvicorn.error")
 
 
 def _now_iso() -> str:
@@ -141,6 +143,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Temporary deployment diagnostics; remove after Render env verification.
+logger.info("CORS_ALLOWED_ORIGINS=%s", os.getenv("CORS_ALLOWED_ORIGINS", ""))
+logger.info("OAUTH_REDIRECT_URI=%s", OAUTH_REDIRECT_URI or "")
+logger.info("Parsed allowed origins=%s", get_allowed_origins())
 
 @app.middleware("http")
 async def allow_private_network_access(request: Request, call_next):
