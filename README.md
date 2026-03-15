@@ -83,6 +83,7 @@ OAUTH_USERINFO_URL=<provider-userinfo-endpoint>   # optional but recommended
 OAUTH_REDIRECT_URI=http://localhost:5173/oauth/callback
 OAUTH_SCOPE="openid profile email"
 JWT_SECRET_KEY=<strong-random-secret>
+CORS_ALLOWED_ORIGINS=http://localhost:5173
 ```
 
 Optional role mapping for OAuth users:
@@ -101,6 +102,19 @@ npm run dev
 
 Frontend URL:
 - `http://localhost:5173`
+
+Frontend API base URL for local frontend against a deployed backend:
+
+```bash
+VITE_API_BASE_URL=https://playwright-practice-app-ibnw.onrender.com
+```
+
+Deployed example values:
+- Backend (`Render`)
+  - `CORS_ALLOWED_ORIGINS=https://playwright-practice-kt6h4djmd-mallikarjun-roddannavars-projects.vercel.app`
+  - `OAUTH_REDIRECT_URI=https://playwright-practice-kt6h4djmd-mallikarjun-roddannavars-projects.vercel.app/oauth/callback`
+- Frontend (`Vercel`)
+  - `VITE_API_BASE_URL=https://playwright-practice-app-ibnw.onrender.com`
 
 Login page now supports:
 - Username/password login (`/token`)

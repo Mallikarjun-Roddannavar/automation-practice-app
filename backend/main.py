@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import mimetypes
 import re
 import uuid
@@ -126,8 +127,15 @@ app = FastAPI(
 
 LOCAL_ORIGIN_REGEX = r"https?://(localhost|127\.0\.0\.1)(:\d+)?$"
 
+
+def get_allowed_origins() -> list[str]:
+    configured_origins = os.getenv("CORS_ALLOWED_ORIGINS", "")
+    return [origin.strip() for origin in configured_origins.split(",") if origin.strip()]
+
+
 app.add_middleware(
     CORSMiddleware,
+    allow_origins=get_allowed_origins(),
     allow_origin_regex=LOCAL_ORIGIN_REGEX,
     allow_credentials=True,
     allow_methods=["*"],
@@ -456,3 +464,4 @@ def delete_file(folder_id: str, file_id: str, current_user: AppUser = Depends(ge
         folder["files"] = [f for f in folder["files"] if f["id"] != file_id]
         save_db(data)
     return {"message": "File deleted"}
+
