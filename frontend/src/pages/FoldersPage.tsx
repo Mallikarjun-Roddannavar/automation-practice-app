@@ -285,11 +285,11 @@ export function FoldersPage() {
                   New Folder
                 </button>
               )}
-              {!isViewer && (
+              {canDelete && (
                 <button
                   className="btn-danger px-4 py-2 disabled:opacity-60"
                   onClick={() => setDeletingFoldersBulk(true)}
-                  disabled={!canDelete || selectedFolderIds.length === 0}
+                  disabled={selectedFolderIds.length === 0}
                   data-testid="folders-bulk-delete-btn"
                 >
                   Delete Selected
@@ -365,22 +365,24 @@ export function FoldersPage() {
                             >
                               Open in New Tab
                             </a>
-                            <button
-                              className="btn-secondary px-3 py-2 disabled:opacity-60"
-                              onClick={() => {
-                                setEditingFolder(folder);
-                                setNewName(folder.name);
-                              }}
-                              disabled={!canCreateEdit || !selectedFolderIds.includes(folder.id)}
-                              data-testid={`folder-rename-btn-${folder.id}`}
-                            >
-                              Rename
-                            </button>
-                            {!isViewer && (
+                            {canCreateEdit && (
+                              <button
+                                className="btn-secondary px-3 py-2 disabled:opacity-60"
+                                onClick={() => {
+                                  setEditingFolder(folder);
+                                  setNewName(folder.name);
+                                }}
+                                disabled={!selectedFolderIds.includes(folder.id)}
+                                data-testid={`folder-rename-btn-${folder.id}`}
+                              >
+                                Rename
+                              </button>
+                            )}
+                            {canDelete && (
                               <button
                                 className="btn-danger px-3 py-2 disabled:opacity-60"
                                 onClick={() => setDeletingFolder(folder)}
-                                disabled={!canDelete || !selectedFolderIds.includes(folder.id)}
+                                disabled={!selectedFolderIds.includes(folder.id)}
                                 data-testid={`folder-delete-btn-${folder.id}`}
                               >
                                 Delete
@@ -476,22 +478,22 @@ export function FoldersPage() {
                             </a>
                           </div>
                           <div className="app-row-actions">
-                            <button
-                              className="btn-secondary px-3 py-2 disabled:opacity-60"
-                              onClick={() => {
-                                setEditingFolder(folder);
-                                setNewName(folder.name);
-                              }}
-                              disabled={!canCreateEdit}
-                              data-testid={`folder-rename-btn-${folder.id}`}
-                            >
-                              Rename
-                            </button>
-                            {!isViewer && (
+                            {canCreateEdit && (
                               <button
-                                className="btn-danger px-3 py-2 disabled:opacity-60"
+                                className="btn-secondary px-3 py-2"
+                                onClick={() => {
+                                  setEditingFolder(folder);
+                                  setNewName(folder.name);
+                                }}
+                                data-testid={`folder-rename-btn-${folder.id}`}
+                              >
+                                Rename
+                              </button>
+                            )}
+                            {canDelete && (
+                              <button
+                                className="btn-danger px-3 py-2"
                                 onClick={() => setDeletingFolder(folder)}
-                                disabled={!canDelete}
                                 data-testid={`folder-delete-btn-${folder.id}`}
                               >
                                 Delete

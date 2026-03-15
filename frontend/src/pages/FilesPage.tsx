@@ -291,7 +291,7 @@ export function FilesPage() {
               >
                 Download All
               </button>
-              {canDelete && (
+              {files.length > 0 && (
                 <button
                   className="btn-secondary px-4 py-2 disabled:opacity-60"
                   onClick={() => downloadMultipleFiles(selectedFileIds)}
@@ -301,11 +301,11 @@ export function FilesPage() {
                   Download Selected
                 </button>
               )}
-              {!isViewer && (
+              {canDelete && (
                 <button
                   className="btn-danger px-4 py-2 disabled:opacity-60"
                   onClick={() => setDeletingFilesBulk(true)}
-                  disabled={!canDelete || selectedFileIds.length === 0}
+                  disabled={selectedFileIds.length === 0}
                   data-testid="files-bulk-delete-btn"
                 >
                   Delete Selected
@@ -366,17 +366,19 @@ export function FilesPage() {
                         <td className="p-3">{new Date(file.uploadedAt).toLocaleString()}</td>
                         <td className="p-3">
                           <div className="app-row-actions">
-                            <button
-                              className="btn-secondary px-3 py-2 disabled:opacity-60"
-                              onClick={() => {
-                                setRenamingFile(file);
-                                setNewName(file.name);
-                              }}
-                              disabled={!canCreateEdit || !selectedFileIds.includes(file.id)}
-                              data-testid={`file-rename-btn-${file.id}`}
-                            >
-                              Rename
-                            </button>
+                            {canCreateEdit && (
+                              <button
+                                className="btn-secondary px-3 py-2 disabled:opacity-60"
+                                onClick={() => {
+                                  setRenamingFile(file);
+                                  setNewName(file.name);
+                                }}
+                                disabled={!selectedFileIds.includes(file.id)}
+                                data-testid={`file-rename-btn-${file.id}`}
+                              >
+                                Rename
+                              </button>
+                            )}
                             <button
                               className="btn-secondary px-3 py-2 disabled:opacity-60"
                               onClick={() => previewFile(file.id)}
@@ -393,11 +395,11 @@ export function FilesPage() {
                             >
                               Download
                             </button>
-                            {!isViewer && (
+                            {canDelete && (
                               <button
                                 className="btn-danger px-3 py-2 disabled:opacity-60"
                                 onClick={() => setDeletingFile(file)}
-                                disabled={!canDelete || !selectedFileIds.includes(file.id)}
+                                disabled={!selectedFileIds.includes(file.id)}
                                 data-testid={`file-delete-btn-${file.id}`}
                               >
                                 Delete
@@ -495,22 +497,22 @@ export function FilesPage() {
                             </button>
                           </div>
                           <div className="app-row-actions">
-                            <button
-                              className="btn-secondary px-3 py-2 disabled:opacity-60"
-                              onClick={() => {
-                                setRenamingFile(file);
-                                setNewName(file.name);
-                              }}
-                              disabled={!canCreateEdit}
-                              data-testid={`file-rename-btn-${file.id}`}
-                            >
-                              Rename
-                            </button>
-                            {!isViewer && (
+                            {canCreateEdit && (
                               <button
-                                className="btn-danger px-3 py-2 disabled:opacity-60"
+                                className="btn-secondary px-3 py-2"
+                                onClick={() => {
+                                  setRenamingFile(file);
+                                  setNewName(file.name);
+                                }}
+                                data-testid={`file-rename-btn-${file.id}`}
+                              >
+                                Rename
+                              </button>
+                            )}
+                            {canDelete && (
+                              <button
+                                className="btn-danger px-3 py-2"
                                 onClick={() => setDeletingFile(file)}
-                                disabled={!canDelete}
                                 data-testid={`file-delete-btn-${file.id}`}
                               >
                                 Delete

@@ -62,11 +62,31 @@ def _seed_data() -> dict:
     return {"folders": []}
 
 
+def normalize_db(data: dict) -> tuple[dict, bool]:
+    changed = False
+    folders = data.get("folders")
+    if not isinstance(folders, list):
+        data["folders"] = []
+        folders = data["folders"]
+        changed = True
+
+    for folder in folders:
+        if "files" not in folder or not isinstance(folder["files"], list):
+            folder["files"] = []
+            changed = True
+
+    return data, changed
+
+
 def load_db() -> dict:
     if not DB_PATH.exists():
         save_db(_seed_data())
     with DB_PATH.open("r", encoding="utf-8-sig") as file:
-        return json.load(file)
+        data = json.load(file)
+    data, changed = normalize_db(data)
+    if changed:
+        save_db(data)
+    return data
 
 
 def save_db(data: dict) -> None:

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { api } from "../api";
 import { AppLayout } from "../components/AppLayout";
 import { useAuth } from "../context/AuthContext";
+import "./HomePage.css";
 
 type Stats = { totalFolders: number; totalFiles: number };
 
@@ -14,11 +15,34 @@ export function HomePage() {
   const wheelResetRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setStats({ totalFolders: 0, totalFiles: 0 });
+      return;
+    }
+
+    let cancelled = false;
     setLoading(true);
+
     api.stats(user)
-      .then(setStats)
-      .finally(() => setLoading(false));
+      .then((nextStats) => {
+        if (!cancelled) {
+          setStats(nextStats);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setStats({ totalFolders: 0, totalFiles: 0 });
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [user]);
 
   useEffect(() => {
@@ -244,4 +268,3 @@ export function HomePage() {
     </AppLayout>
   );
 }
-
