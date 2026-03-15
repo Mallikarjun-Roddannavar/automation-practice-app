@@ -29,6 +29,11 @@ Frontend-specific instructions for `playwright-practice-app/frontend`.
   - `viewer`: read-only
   - `editor`: create/edit/upload
   - `admin`: delete allowed
+- Prefer hiding actions a role cannot perform instead of rendering disabled controls for unauthorized roles.
+- In the current UI contract:
+  - `viewer` should not see create, rename, upload, or delete actions
+  - `editor` should see create, rename, and upload actions, but not delete actions
+  - `admin` should see all CRUD actions
 
 ## UI behavior that must remain intact
 - Profile menu + preferences flow

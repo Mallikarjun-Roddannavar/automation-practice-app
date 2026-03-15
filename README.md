@@ -126,6 +126,10 @@ UI behavior for Playwright practice:
 - File rows include `Preview` popup button (`window.open`).
 - Folder and File pages support 5-second auto-polling and manual `Refresh` buttons.
 - Toast notifications are enabled via `react-toastify` for async success/error flows.
+- Frontend RBAC visibility mirrors backend permissions:
+  - `viewer` sees read-only navigation and file/folder browsing actions
+  - `editor` sees create, rename, and upload actions
+  - `admin` sees delete actions in addition to create, rename, and upload
 
 Frontend visual direction:
 - premium glassmorphic shell for header, sidebar, and menus

@@ -12,7 +12,7 @@ import type { FileItem, Folder } from "../types";
 export function FilesPage() {
   const { folderId = "" } = useParams();
   const navigate = useNavigate();
-  const { user, canCreateEdit, canDelete, isViewer } = useAuth();
+  const { user, canCreateEdit, canDelete } = useAuth();
   const [viewMode, setViewMode] = useState<"list" | "cards">("list");
   const [folders, setFolders] = useState<Folder[]>([]);
   const [files, setFiles] = useState<FileItem[]>([]);
@@ -273,11 +273,10 @@ export function FilesPage() {
               </button>
             </div>
             <div className="app-toolbar-group">
-              {!isViewer && (
+              {canCreateEdit && (
                 <button
-                  className="btn-primary px-4 py-2 disabled:opacity-60"
+                  className="btn-primary px-4 py-2"
                   onClick={() => setShowUploadDialog(true)}
-                  disabled={!canCreateEdit}
                   data-testid="files-upload-action-btn"
                 >
                   Upload File

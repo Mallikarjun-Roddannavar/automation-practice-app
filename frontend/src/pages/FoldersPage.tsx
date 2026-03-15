@@ -11,7 +11,7 @@ import type { Folder } from "../types";
 
 export function FoldersPage() {
   const navigate = useNavigate();
-  const { user, canCreateEdit, canDelete, isViewer } = useAuth();
+  const { user, canCreateEdit, canDelete } = useAuth();
   const [viewMode, setViewMode] = useState<"list" | "cards">("list");
   const [folders, setFolders] = useState<Folder[]>([]);
   const [loading, setLoading] = useState(false);
@@ -271,15 +271,14 @@ export function FoldersPage() {
               >
                 Refresh
               </button>
-              {!isViewer && (
+              {canCreateEdit && (
                 <button
-                  className="btn-primary px-4 py-2 disabled:opacity-60"
+                  className="btn-primary px-4 py-2"
                   onClick={() => {
                     setCreateError("");
                     setNewName("");
                     setShowCreate(true);
                   }}
-                  disabled={!canCreateEdit}
                   data-testid="new-folder-btn"
                 >
                   New Folder
