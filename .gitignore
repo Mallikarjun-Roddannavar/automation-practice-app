@@ -8,3 +8,4 @@ playwright-pom-agent-skills/
 **/.mypy_cache/
 **/.idea/
 **/.vscode/
+**/database.json
