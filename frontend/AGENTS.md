@@ -14,13 +14,48 @@ Frontend-specific instructions for `playwright-practice-app/frontend`.
 - Shared layout/components in `src/components/`
 - Pages in `src/pages/`
 
-## UX/testability requirements
-- Every interactive element must have a stable `data-testid`.
-- Do not remove existing test IDs unless explicitly requested.
-- For any new button/input/link/dialog action, add a `data-testid`.
+## Procedural Workflow: Adding a New UI Feature
+1. Define any new API calls in `src/api.ts`, ensuring they use Bearer tokens for auth.
+2. Create or update components in `src/components/` or pages in `src/pages/`.
+3. Use shared Tailwind classes from `src/index.css`.
+4. Implement UI visibility based on the user's role from the `AuthContext` (e.g., hide delete buttons for editors).
+5. Ensure all new interactive elements (buttons, inputs, links) have a `data-testid` attribute.
+
+### Template: React Component
+When creating a new component or page, follow this structure:
+```tsx
+import React from 'react';
+import { useAuth } from '../context/AuthContext';
+
+export const ExampleComponent: React.FC = () => {
+    const { user } = useAuth();
+
+    // Hide actions the user is not authorized to perform
+    const canDelete = user?.role === 'admin';
+
+    return (
+        <div className="app-workspace">
+            <h1 className="text-xl font-bold dark:text-white">Example</h1>
+            <button data-testid="example-btn" className="btn-primary">
+                Action
+            </button>
+            {canDelete && (
+                <button data-testid="example-delete-btn" className="btn-danger">
+                    Delete
+                </button>
+            )}
+        </div>
+    );
+};
+```
+
+## UX/testability requirements & Gotchas
+- Every interactive element must have a stable `data-testid`. **Do not remove existing test IDs.**
 - Keep deep links functional:
   - `/folders/:folderId`
   - `/oauth/callback`
+- Prefer hiding actions a role cannot perform instead of rendering disabled controls for unauthorized roles.
+- Toast notifications should be used for async success/error flows via `react-toastify`.
 
 ## Auth and RBAC requirements
 - Use Bearer token auth from `api.ts` for protected calls.
@@ -29,7 +64,6 @@ Frontend-specific instructions for `playwright-practice-app/frontend`.
   - `viewer`: read-only
   - `editor`: create/edit/upload
   - `admin`: delete allowed
-- Prefer hiding actions a role cannot perform instead of rendering disabled controls for unauthorized roles.
 - In the current UI contract:
   - `viewer` should not see create, rename, upload, or delete actions
   - `editor` should see create, rename, and upload actions, but not delete actions
@@ -61,16 +95,17 @@ Frontend-specific instructions for `playwright-practice-app/frontend`.
   - reveal/hover motion should enhance existing cards and sections instead of introducing new floating panels unless explicitly requested
 - Avoid ad hoc button variants, social-feed layouts, and heavy neumorphic treatment for primary actions.
 
-## Verification commands
-- Install/update deps when needed:
-  - `npm install`
-- Build check:
-  - `npm run build`
-- Dev server:
-  - `npm run dev`
+## Validation Loop for Frontend Changes
+1. Make your code changes.
+2. Run build check: `npm run build`.
+3. If the build fails, review TypeScript or Vite errors, fix them, and repeat step 2.
+4. Run reusable scripts to validate UI invariants: `node scripts/check-test-ids.js`. Fix any issues and repeat.
+5. Run dev server: `npm run dev`.
+6. Open the browser and manually test the UI changes (verify styling, interactions, and `data-testid` presence).
+7. Verify RBAC by logging in as different roles (`admin`, `editor`, `viewer`) and ensuring the UI reflects correct permissions.
+8. Only proceed when validation passes.
 
 ## Change hygiene
 - Prefer small, focused updates.
 - Keep component responsibilities clear.
 - If API contracts change, update `api.ts` and affected pages together.
-

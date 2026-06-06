@@ -13,6 +13,31 @@ Backend-specific instructions for `playwright-practice-app/backend`.
 - Data store: `database.json`
 - File store: `uploads/`
 
+## Procedural Workflow: Adding a New Endpoint
+1. Define the Pydantic schema in `models.py` if a new request or response body is needed.
+2. Implement the endpoint function in `main.py`.
+3. Protect the endpoint by injecting the `get_current_user` dependency.
+4. Enforce RBAC logic inside the endpoint (check `user.role` against requirements).
+5. Document expected error responses for frontend handling.
+
+### Template: FastAPI Endpoint
+```python
+@app.post("/example", response_model=ExampleResponse)
+async def create_example(
+    request: ExampleRequest,
+    user: User = Depends(get_current_user)
+):
+    # RBAC Enforcement
+    if user.role not in ["editor", "admin"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only editors and admins can create examples."
+        )
+
+    # Implementation here
+    return {"message": "Success"}
+```
+
 ## Auth requirements
 - Password flow endpoint:
   - `POST /token` (OAuth2PasswordRequestForm)
@@ -33,21 +58,21 @@ Backend-specific instructions for `playwright-practice-app/backend`.
 - File metadata in JSON must match real files in `uploads/`.
 - On folder deletion, remove associated uploaded files from disk.
 
-## API behavior requirements
+## Gotchas & API behavior requirements
+- The `/docs` must remain usable for API automation practice.
 - Maintain predictable errors (`detail` field) for frontend toasts/tests.
-- Keep `/docs` usable for API automation practice.
 - Preserve endpoint URLs unless user explicitly asks to change them.
 - If adding endpoints, follow existing naming style and dependency injection pattern.
+- The `database.json` might be read/written concurrently. Do not overwrite changes made by other operations; read before writing.
 
-## Local verification
-- Syntax:
-  - `python -m py_compile main.py auth.py models.py`
-- Run server:
-  - `uvicorn main:app --reload --port 8000`
-- Quick API checks:
-  - `/health`
-  - `/token` login
-  - one protected endpoint using Bearer token
+## Validation Loop for Backend Changes
+1. Make your code changes.
+2. Run syntax check: `python -m py_compile main.py auth.py models.py`.
+3. If there are syntax errors, fix them and repeat step 2.
+4. Start the server: `uvicorn main:app --reload --port 8000`.
+5. Check `/health` endpoint to verify the server starts.
+6. Test your specific changes using `curl`, Swagger UI, or Playwright API tests.
+7. Only proceed when validation passes.
 
 ## Dependency rules
 - Keep dependencies lean.
