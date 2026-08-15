@@ -36,6 +36,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
             onClick={() => setNavOpen(true)}
             data-testid="hamburger-menu-btn"
             aria-label="Open navigation menu"
+            aria-expanded={navOpen}
+            aria-controls="app-sidebar-drawer"
           >
             <span className="mb-1 block h-0.5 w-5 bg-current" />
             <span className="mb-1 block h-0.5 w-5 bg-current" />
@@ -57,6 +59,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
               onClick={() => setProfileOpen((prev) => !prev)}
               data-testid="profile-menu-btn"
               aria-label="Open profile menu"
+              aria-expanded={profileOpen}
+              aria-controls="profile-menu"
             >
               {profileIcon ? (
                 <img
@@ -81,6 +85,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             </button>
             {profileOpen && (
               <div
+                id="profile-menu"
                 className="dropdown-panel absolute right-0 top-full z-30 mt-3 w-64 p-4"
                 data-testid="profile-menu"
               >

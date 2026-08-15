@@ -77,8 +77,14 @@ export function LoginPage() {
             Roles: admin/admin123, editor/editor123, viewer/viewer123
           </p>
           <div className="mt-5">
-            <label className="block text-sm font-medium">Username</label>
+            <label htmlFor="login-username" className="block text-sm font-medium">
+              Username
+            </label>
             <input
+              id="login-username"
+              name="username"
+              autoComplete="username"
+              required
               className="app-input mt-1"
               value={username}
               onChange={(event) => setUsername(event.target.value)}
@@ -86,9 +92,15 @@ export function LoginPage() {
             />
           </div>
           <div className="mt-4">
-            <label className="block text-sm font-medium">Password</label>
+            <label htmlFor="login-password" className="block text-sm font-medium">
+              Password
+            </label>
             <input
+              id="login-password"
+              name="password"
               type="password"
+              autoComplete="current-password"
+              required
               className="app-input mt-1"
               value={password}
               onChange={(event) => setPassword(event.target.value)}

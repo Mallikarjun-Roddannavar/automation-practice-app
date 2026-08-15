@@ -1,6 +1,7 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 
+import { AUTH_SESSION_EXPIRED_EVENT, userFromAccessToken } from "../api";
 import type { Role, User } from "../types";
 
 type AuthContextValue = {
@@ -17,11 +18,16 @@ const STORAGE_KEY = "playwright_practice_auth_user";
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 function getStoredUser(): User | null {
-  const value = localStorage.getItem(STORAGE_KEY);
-  if (!value) return null;
   try {
-    return JSON.parse(value) as User;
+    const value = localStorage.getItem(STORAGE_KEY);
+    if (!value) return null;
+    const stored = JSON.parse(value) as Partial<User>;
+    if (typeof stored.accessToken !== "string") return null;
+    const tokenUser = userFromAccessToken(stored.accessToken);
+    if (stored.username !== tokenUser.username || stored.role !== tokenUser.role) return null;
+    return tokenUser;
   } catch {
+    localStorage.removeItem(STORAGE_KEY);
     return null;
   }
 }
@@ -32,6 +38,15 @@ function hasRole(user: User | null, roles: Role[]): boolean {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(getStoredUser);
+
+  useEffect(() => {
+    const clearExpiredSession = () => {
+      localStorage.removeItem(STORAGE_KEY);
+      setUser(null);
+    };
+    window.addEventListener(AUTH_SESSION_EXPIRED_EVENT, clearExpiredSession);
+    return () => window.removeEventListener(AUTH_SESSION_EXPIRED_EVENT, clearExpiredSession);
+  }, []);
 
   const value = useMemo<AuthContextValue>(() => {
     const login = (nextUser: User) => {

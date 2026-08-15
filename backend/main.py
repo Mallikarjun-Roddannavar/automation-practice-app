@@ -50,6 +50,7 @@ BASE_DIR = Path(__file__).resolve().parent
 DB_PATH = BASE_DIR / "database.json"
 UPLOADS_DIR = BASE_DIR / "uploads"
 UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+MAX_UPLOAD_SIZE_BYTES = max(1, int(os.getenv("MAX_UPLOAD_SIZE_BYTES", str(10 * 1024 * 1024))))
 
 STORE_LOCK = Lock()
 
@@ -90,8 +91,15 @@ def load_db() -> dict:
 
 
 def save_db(data: dict) -> None:
-    with DB_PATH.open("w", encoding="utf-8", newline="\n") as file:
-        json.dump(data, file, indent=2)
+    temp_path = DB_PATH.with_name(f".{DB_PATH.name}.{uuid.uuid4().hex}.tmp")
+    try:
+        with temp_path.open("w", encoding="utf-8", newline="\n") as file:
+            json.dump(data, file, indent=2)
+            file.flush()
+            os.fsync(file.fileno())
+        os.replace(temp_path, DB_PATH)
+    finally:
+        temp_path.unlink(missing_ok=True)
 
 
 def require_editor_or_admin(user: AppUser) -> None:
@@ -137,6 +145,15 @@ def _sanitize_download_name(name: str, fallback: str) -> str:
         return fallback
     cleaned = re.sub(r'[<>:"/\\|?*\x00-\x1F]+', "_", stripped)
     return cleaned or fallback
+
+
+def _safe_upload_name(filename: str | None) -> str:
+    raw_name = (filename or "").replace("\\", "/")
+    basename = Path(raw_name).name.strip()
+    cleaned = re.sub(r"[\x00-\x1F\x7F]+", "_", basename)
+    if not cleaned or cleaned in {".", ".."}:
+        raise HTTPException(status_code=400, detail="Uploaded file must have a valid name")
+    return cleaned
 
 
 app = FastAPI(
@@ -435,13 +452,20 @@ async def upload_file(
     current_user: AppUser = Depends(get_current_user),
 ) -> dict:
     require_editor_or_admin(current_user)
-    content = await file.read()
-    stored_name = f"{uuid.uuid4()}-{file.filename}"
-    (UPLOADS_DIR / stored_name).write_bytes(content)
+    display_name = _safe_upload_name(file.filename)
+    content = await file.read(MAX_UPLOAD_SIZE_BYTES + 1)
+    if len(content) > MAX_UPLOAD_SIZE_BYTES:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"File exceeds the {MAX_UPLOAD_SIZE_BYTES}-byte upload limit",
+        )
+
+    stored_name = uuid.uuid4().hex
+    file_path = UPLOADS_DIR / stored_name
 
     file_item = {
         "id": str(uuid.uuid4()),
-        "name": file.filename,
+        "name": display_name,
         "storedName": stored_name,
         "uploadedAt": _now_iso(),
         "uploadedBy": current_user.username,
@@ -450,8 +474,13 @@ async def upload_file(
     with STORE_LOCK:
         data = load_db()
         folder = find_folder(data, folder_id)
-        folder["files"].append(file_item)
-        save_db(data)
+        try:
+            file_path.write_bytes(content)
+            folder["files"].append(file_item)
+            save_db(data)
+        except Exception:
+            file_path.unlink(missing_ok=True)
+            raise
     return file_item
 
 
@@ -485,4 +514,3 @@ def delete_file(folder_id: str, file_id: str, current_user: AppUser = Depends(ge
         folder["files"] = [f for f in folder["files"] if f["id"] != file_id]
         save_db(data)
     return {"message": "File deleted"}
-

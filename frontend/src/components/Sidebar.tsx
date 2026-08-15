@@ -55,9 +55,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         />
       )}
       <aside
+        id="app-sidebar-drawer"
         className={`app-drawer fixed left-0 top-0 z-40 flex h-screen w-72 flex-col p-4 transition-transform duration-200 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
+        aria-hidden={!isOpen}
         data-testid="sidebar-drawer"
       >
         <div className="app-sidebar-head">
@@ -71,6 +73,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               onClick={onClose}
               data-testid="sidebar-close-btn"
               aria-label="Close navigation menu"
+              tabIndex={isOpen ? 0 : -1}
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <path d="M6 6l12 12M18 6 6 18" />
@@ -86,6 +89,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               to={item.to}
               onClick={onClose}
               data-testid={item.testId}
+              tabIndex={isOpen ? 0 : -1}
               className={({ isActive }) =>
                 `nav-link app-sidebar-link ${isActive ? "nav-link-active" : ""}`
               }

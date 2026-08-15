@@ -22,6 +22,9 @@ type JwtClaims = {
   auth_source: string;
 };
 
+export const AUTH_SESSION_EXPIRED_EVENT = "playwright-auth-session-expired";
+const VALID_ROLES: Role[] = ["admin", "editor", "viewer"];
+
 function parseErrorDetail(payload: unknown): string {
   if (!payload || typeof payload !== "object") {
     return "Request failed";
@@ -54,8 +57,16 @@ function decodeJwtPayload(token: string): JwtClaims {
   return JSON.parse(json) as JwtClaims;
 }
 
-function userFromAccessToken(accessToken: string): User {
+export function userFromAccessToken(accessToken: string): User {
   const claims = decodeJwtPayload(accessToken);
+  if (
+    typeof claims.sub !== "string" ||
+    !VALID_ROLES.includes(claims.role) ||
+    typeof claims.exp !== "number" ||
+    claims.exp * 1000 <= Date.now()
+  ) {
+    throw new Error("Invalid or expired access token");
+  }
   return {
     username: claims.sub,
     role: claims.role,
@@ -82,6 +93,9 @@ async function request<T>(
   });
 
   if (!response.ok) {
+    if (response.status === 401 && user) {
+      window.dispatchEvent(new Event(AUTH_SESSION_EXPIRED_EVENT));
+    }
     const payload = await response.json().catch(() => null);
     throw new Error(parseErrorDetail(payload));
   }

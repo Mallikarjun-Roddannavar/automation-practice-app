@@ -14,25 +14,25 @@ For AI coding agents and contributors, follow these instruction files:
 ```text
 /playwright-practice-app
 +-- /backend
-¦   +-- auth.py
-¦   +-- main.py
-¦   +-- models.py
-¦   +-- database.json
-¦   +-- /uploads
-¦   +-- requirements.txt
+ï¿½   +-- auth.py
+ï¿½   +-- main.py
+ï¿½   +-- models.py
+ï¿½   +-- database.json
+ï¿½   +-- /uploads
+ï¿½   +-- requirements.txt
 +-- /frontend
-¦   +-- /src
-¦   ¦   +-- /components
-¦   ¦   +-- /pages
-¦   ¦   +-- /context
-¦   ¦   +-- App.tsx
-¦   +-- package.json
-¦   +-- tailwind.config.js
+ï¿½   +-- /src
+ï¿½   ï¿½   +-- /components
+ï¿½   ï¿½   +-- /pages
+ï¿½   ï¿½   +-- /context
+ï¿½   ï¿½   +-- App.tsx
+ï¿½   +-- package.json
+ï¿½   +-- tailwind.config.js
 +-- /tests
-¦   +-- /api
-¦   +-- /core
-¦   +-- /ui
-¦   +-- playwright.config.ts
+ï¿½   +-- /api
+ï¿½   +-- /core
+ï¿½   +-- /ui
+ï¿½   +-- playwright.config.ts
 +-- README.md
 ```
 
@@ -103,18 +103,11 @@ npm run dev
 Frontend URL:
 - `http://localhost:5173`
 
-Frontend API base URL for local frontend against a deployed backend:
+For local frontend development, configure the API base URL as:
 
 ```bash
-VITE_API_BASE_URL=https://playwright-practice-app-ibnw.onrender.com
+VITE_API_BASE_URL=http://localhost:8000
 ```
-
-Deployed example values:
-- Backend (`Render`)
-  - `CORS_ALLOWED_ORIGINS=https://playwright-practice-kt6h4djmd-mallikarjun-roddannavars-projects.vercel.app`
-  - `OAUTH_REDIRECT_URI=https://playwright-practice-kt6h4djmd-mallikarjun-roddannavars-projects.vercel.app/oauth/callback`
-- Frontend (`Vercel`)
-  - `VITE_API_BASE_URL=https://playwright-practice-app-ibnw.onrender.com`
 
 Login page now supports:
 - Username/password login (`/token`)
@@ -178,18 +171,18 @@ The `tests` folder is now structured for both UI and API automation, with POM an
 ```text
 /tests
 +-- /api
-¦   +-- ApiClient.ts
-¦   +-- authorization.spec.ts
-¦   +-- health.spec.ts
+ï¿½   +-- ApiClient.ts
+ï¿½   +-- authorization.spec.ts
+ï¿½   +-- health.spec.ts
 +-- /core
-¦   +-- auth.setup.ts
-¦   +-- env.ts
-¦   +-- paths.ts
+ï¿½   +-- auth.setup.ts
+ï¿½   +-- env.ts
+ï¿½   +-- paths.ts
 +-- /ui
-¦   +-- /auth
-¦   +-- /e2e
-¦   +-- /fixtures
-¦   +-- /pom
+ï¿½   +-- /auth
+ï¿½   +-- /e2e
+ï¿½   +-- /fixtures
+ï¿½   +-- /pom
 +-- .env.example
 +-- package.json
 +-- playwright.config.ts
