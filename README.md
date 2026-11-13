@@ -1,4 +1,4 @@
-﻿<div align="center">
+<div align="center">
 
 # Everyday Store
 
@@ -27,31 +27,25 @@ Built for humans to explore and for UI and API automation tools to exercise.
 The app includes text and number inputs, checkboxes, radio buttons, date and file inputs, a dropdown, confirmation dialogs, notifications, tooltips, and order tables. Interactive controls have `data-testid` attributes for stable selectors.
 
 ```mermaid
-flowchart TB
-    A([Sign in]) --> R{Account role}
-    R -->|Shopper| S([Shop and view own orders])
-    R -->|Admin| T([Shop and manage the store])
-    S --> B([Browse products])
-    T --> B
-    B --> C([Add to cart])
-    C --> D([Checkout])
-    D --> E([Order placed])
-    E --> F([View own orders])
-    T --> G([Manage products])
-    T --> H([View all orders and update status])
+flowchart LR
+    A([Sign in]) --> R{Role}
+    R -->|Shopper| S([Shop])
+    R -->|Admin| T([Shop and manage])
+    S --> C([Cart and checkout])
+    T --> C
+    C --> O([View own orders])
+    T --> M([Manage products and orders])
 
     classDef start fill:#5138c9,stroke:#5138c9,color:#fff
     classDef role fill:#fff1d9,stroke:#df9a38,color:#5d360c
     classDef shop fill:#eeeaff,stroke:#8a74d7,color:#30205e
-    classDef cart fill:#fff1e8,stroke:#db9875,color:#633323
     classDef order fill:#e0f4e9,stroke:#62a780,color:#194b31
     classDef admin fill:#f5e7fa,stroke:#b179c1,color:#59216c
     class A start
     class R role
-    class S,B shop
-    class C,D cart
-    class E,F order
-    class T,G,H admin
+    class S,C shop
+    class O order
+    class T,M admin
 ```
 
 > **Simulated store:** prices are shown in Indian rupees (INR). No real payment or delivery takes place.
