@@ -1,67 +1,64 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { FormEvent, useEffect, useState } from 'react';
 
-import { useAuth } from "./context/AuthContext";
-import { FilesPage } from "./pages/FilesPage";
-import { FoldersPage } from "./pages/FoldersPage";
-import { HomePage } from "./pages/HomePage";
-import { LoginPage } from "./pages/LoginPage";
-import { OAuthCallbackPage } from "./pages/OAuthCallbackPage";
-import { PreferencesPage } from "./pages/PreferencesPage";
-
-function PrivateRoute({ children }: { children: JSX.Element }) {
-  const { user } = useAuth();
-  return user ? children : <Navigate to="/login" replace />;
-}
-
+type Product = { id: number; name: string; description: string; price: number };
+type Item = { product_id: number; name: string; price: number; quantity: number };
+type Order = { id: number; username: string; name: string; address: string; status: string; total: number; created_at: string; gift_wrap: boolean; delivery_method: string; delivery_date: string | null; attachment_name: string | null; items: Item[] };
+type Session = { access_token: string; username: string; role: 'admin' | 'shopper' };
+const base = import.meta.env.VITE_API_BASE_URL ?? `${window.location.protocol}//${window.location.hostname}:8000`;
+const money = (value: number) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(value);
+const productIcon = (name: string) => { const text = name.toLowerCase(); if (text.includes('notebook')) return '\u{1F4D3}'; if (text.includes('mug')) return '\u2615'; if (text.includes('lamp')) return '\u{1F4A1}'; if (text.includes('bottle')) return '\u{1F9F4}'; return '\u2726'; };
+function read<T>(key: string, fallback: T): T { try { return JSON.parse(localStorage.getItem(key) || '') as T; } catch { return fallback; } }
 export default function App() {
-  const { user } = useAuth();
+  const [session, setSession] = useState<Session | null>(() => read('shop-session', null));
+  const [cart, setCart] = useState<Record<number, number>>(() => read('shop-cart', {}));
+  const [products, setProducts] = useState<Product[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [page, setPage] = useState<'shop' | 'cart' | 'orders' | 'admin'>('shop');
+  const [search, setSearch] = useState('');
+  const [username, setUsername] = useState(''); const [password, setPassword] = useState('');
+  const [name, setName] = useState(''); const [address, setAddress] = useState('');
+  const [giftWrap, setGiftWrap] = useState(false); const [deliveryMethod, setDeliveryMethod] = useState('standard'); const [deliveryDate, setDeliveryDate] = useState(''); const [attachment, setAttachment] = useState<File | null>(null);
+  const [editing, setEditing] = useState<number | null>(null);
+  const [productName, setProductName] = useState(''); const [description, setDescription] = useState(''); const [price, setPrice] = useState('');
+  const [error, setError] = useState(''); const [loading, setLoading] = useState(false);
+  const [notice, setNotice] = useState<{ text: string; id: number } | null>(null);
+  const notify = (text: string) => setNotice({ text, id: Date.now() });
+  useEffect(() => { if (!notice) return; const timer = window.setTimeout(() => setNotice(null), 4000); return () => window.clearTimeout(timer); }, [notice]);
+  const notification = notice && <div className="notification" role="status" aria-live="polite" data-testid="action-notification"><span className="notification-icon" aria-hidden="true">&#10003;</span><span>{notice.text}</span><button type="button" className="notification-close" data-testid="notification-dismiss" aria-label="Dismiss notification" onClick={() => setNotice(null)}>&#215;</button></div>;
+  useEffect(() => { localStorage.setItem('shop-cart', JSON.stringify(cart)); }, [cart]);
+  async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+    const headers = new Headers(options.headers); if (session) headers.set('Authorization', `Bearer ${session.access_token}`);
+    if (options.body && !(options.body instanceof URLSearchParams)) headers.set('Content-Type', 'application/json');
+    const response = await fetch(base + path, { ...options, headers });
+    if (response.status === 401 && session) { localStorage.removeItem('shop-session'); setSession(null); throw new Error('Session expired. Please sign in again.'); }
+    const data = await response.json(); if (!response.ok) throw new Error(typeof data.detail === 'string' ? data.detail : 'Please check your input.'); return data as T;
+  }
+  async function run(action: () => Promise<void>) { setError(''); setLoading(true); try { await action(); } catch (e) { const detail = e instanceof Error ? e.message : 'Something went wrong'; setError(detail); } finally { setLoading(false); } }
+  async function loadProducts() { setProducts(await request<Product[]>('/products')); }
+  async function loadOrders() { setOrders(await request<Order[]>('/orders')); }
+  useEffect(() => { if (session) { void run(loadProducts); } }, [session]);
+  useEffect(() => { if (session && page === 'orders') void run(loadOrders); }, [page, session]);
+  const login = (e: FormEvent) => { e.preventDefault(); void run(async () => { const result = await request<Session>('/token', { method: 'POST', body: new URLSearchParams({ username, password }) }); localStorage.setItem('shop-session', JSON.stringify(result)); setSession(result); setPassword(''); }); };
+  const logout = () => { localStorage.removeItem('shop-session'); setSession(null); setPage('shop'); setError(''); };
+  const changeQuantity = (id: number, quantity: number) => setCart(current => { const next = { ...current }; if (quantity <= 0) delete next[id]; else next[id] = Math.min(100, quantity); return next; });
+  const cartProducts = Object.entries(cart).map(([id, quantity]) => ({ id: Number(id), quantity, product: products.find(p => p.id === Number(id)) }));
+  const checkout = (e: FormEvent) => { e.preventDefault(); void run(async () => {
+    let attachmentBase64: string | null = null;
+    if (attachment) {
+      if (attachment.size === 0 || attachment.size > 1024 * 1024) throw new Error('Choose a non-empty file no larger than 1 MB.');
+      attachmentBase64 = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result).split(',')[1]); reader.onerror = () => reject(new Error('Could not read the attachment.')); reader.readAsDataURL(attachment); });
+    }
+    const order = await request<Order>('/orders', { method: 'POST', body: JSON.stringify({ name, address, items: cartProducts.map(i => ({ product_id: i.id, quantity: i.quantity })), gift_wrap: giftWrap, delivery_method: deliveryMethod, delivery_date: deliveryDate || null, attachment_name: attachment?.name || null, attachment_base64: attachmentBase64 }) });
+    setCart({}); setName(''); setAddress(''); setGiftWrap(false); setDeliveryMethod('standard'); setDeliveryDate(''); setAttachment(null); notify(`Order #${order.id} placed successfully.`); setPage('shop');
+  }); };
+  const downloadAttachment = (order: Order) => { void run(async () => { const response = await fetch(`${base}/orders/${order.id}/attachment`, { headers: { Authorization: `Bearer ${session?.access_token}` } }); if (!response.ok) throw new Error('Could not download the attachment.'); const url = URL.createObjectURL(await response.blob()); const link = document.createElement('a'); link.href = url; link.download = order.attachment_name || 'attachment'; link.click(); URL.revokeObjectURL(url); }); };
 
-  return (
-    <>
-      <div className="app-bg-orbs" aria-hidden="true">
-        <span className="app-bg-orb" />
-        <span className="app-bg-orb" />
-        <span className="app-bg-orb" />
-        <span className="app-bg-orb" />
-      </div>
-      <Routes>
-        <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
-        <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
-        <Route
-          path="/"
-          element={
-            <PrivateRoute>
-              <HomePage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/folders"
-          element={
-            <PrivateRoute>
-              <FoldersPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/folders/:folderId"
-          element={
-            <PrivateRoute>
-              <FilesPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/preferences"
-          element={
-            <PrivateRoute>
-              <PreferencesPage />
-            </PrivateRoute>
-          }
-        />
-        <Route path="*" element={<Navigate to={user ? "/" : "/login"} replace />} />
-      </Routes>
-    </>
-  );
+  const saveProduct = (e: FormEvent) => { e.preventDefault(); void run(async () => { await request(editing === null ? '/products' : `/products/${editing}`, { method: editing === null ? 'POST' : 'PUT', body: JSON.stringify({ name: productName, description, price: Number(price) }) }); setEditing(null); setProductName(''); setDescription(''); setPrice(''); await loadProducts(); notify('Product saved.'); }); };
+  if (!session) return <main className="login-wrap"><form className="panel login" onSubmit={login}><span className="eyebrow">EVERYDAY STORE</span><h1>Welcome back</h1><p>Sign in to explore the shop.</p>{error && <div className="alert error" role="alert">{error}</div>}<label>Username<input data-testid="login-username" value={username} onChange={e => setUsername(e.target.value)} required /></label><label>Password<input data-testid="login-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required /></label><button data-testid="login-submit" data-tooltip="Sign in to the store" disabled={loading}>Sign in</button><p className="hint">Try shopper / shopper123 or admin / admin123</p></form>{notification}</main>;
+  return <><header><div className="header-inner"><button className="brand" data-testid="nav-shop" onClick={() => setPage('shop')}><span className="brand-mark">E</span><span>Everyday Store<small>EVERYDAY FINDS</small></span></button><nav><button data-testid="nav-products" className={page === 'shop' ? 'active' : ''} onClick={() => setPage('shop')}>Shop</button><button data-testid="nav-cart" className={page === 'cart' ? 'active' : ''} onClick={() => setPage('cart')}>Cart ({Object.values(cart).reduce((a, b) => a + b, 0)})</button><button data-testid="nav-orders" className={page === 'orders' ? 'active' : ''} onClick={() => setPage('orders')}>Orders</button>{session.role === 'admin' && <button data-testid="nav-admin" className={page === 'admin' ? 'active' : ''} onClick={() => setPage('admin')}>Manage products</button>}</nav><div className="account"><span>{session.username}</span><button data-testid="logout" data-tooltip="Sign out of your account" className="secondary" onClick={logout}>Sign out</button></div></div></header><main className="container">{error && <div className="alert error" role="alert">{error}</div>}
+  {page === 'shop' && <><div className="page-heading"><div><span className="eyebrow">GOOD FINDS FOR EVERY DAY</span><h1>A little joy, delivered.</h1><p>Thoughtful essentials for the little moments in your day.</p></div><label className="search">Search products<input data-testid="product-search" placeholder="Search the shop" value={search} onChange={e => setSearch(e.target.value)} /></label></div><div className="grid">{products.filter(p => p.name.toLowerCase().includes(search.toLowerCase())).map(p => <article className="product" key={p.id}><div className="product-art" aria-hidden="true"><span>{productIcon(p.name)}</span></div><div className="product-body"><h2>{p.name}</h2><p>{p.description}</p><div className="product-footer"><strong>{money(p.price)}</strong><button data-testid={`add-to-cart-${p.id}`} data-tooltip="Add this item to your cart" onClick={() => { if ((cart[p.id] || 0) >= 100) { notify("Maximum quantity is 100."); return; } changeQuantity(p.id, (cart[p.id] || 0) + 1); notify(`${p.name} added to your cart`); }}>Add to cart</button></div></div></article>)}</div>{!products.filter(p => p.name.toLowerCase().includes(search.toLowerCase())).length && <p>No products found.</p>}</>}
+  {page === 'cart' && <><div className="page-heading"><div><span className="eyebrow">YOUR SELECTION</span><h1>Shopping cart</h1></div></div>{!cartProducts.length ? <div className="panel"><p>Your cart is empty.</p><button data-testid="cart-continue" onClick={() => setPage('shop')}>Browse products</button></div> : <div className="cart-layout"><div className="panel">{cartProducts.map(i => <div className="cart-row" key={i.id}><div><strong>{i.product?.name || 'Product no longer available'}</strong><p>{i.product ? money(i.product.price) : 'Remove this item to continue.'}</p></div><label>Qty<input data-testid={`cart-quantity-${i.id}`} title="Change quantity from 1 to 100" type="number" min="1" max="100" value={i.quantity} onChange={e => changeQuantity(i.id, Number(e.target.value))} /></label><button data-testid={`cart-remove-${i.id}`} data-tooltip="Remove this item from your cart" className="secondary" onClick={() => { changeQuantity(i.id, 0); notify(`${i.product?.name || "Item"} removed from your cart`); }}>Remove</button></div>)}<strong>Total: {money(cartProducts.reduce((sum, i) => sum + (i.product?.price || 0) * i.quantity, 0))}</strong></div><form className="panel" onSubmit={checkout}><h2>Checkout</h2><p>Orders are simulated. No payment is required.</p><label>Delivery name<input data-testid="checkout-name" value={name} onChange={e => setName(e.target.value)} required /></label><label>Delivery address<textarea data-testid="checkout-address" value={address} onChange={e => setAddress(e.target.value)} required /></label><fieldset className="checkout-options"><legend>Delivery method</legend><div className="choice-group"><label className="choice"><input data-testid="delivery-standard" type="radio" name="delivery-method" value="standard" checked={deliveryMethod === 'standard'} onChange={() => setDeliveryMethod('standard')} /> Standard</label><label className="choice"><input data-testid="delivery-express" type="radio" name="delivery-method" value="express" checked={deliveryMethod === 'express'} onChange={() => setDeliveryMethod('express')} /> Express</label></div></fieldset><label>Preferred delivery date (optional)<input data-testid="preferred-date" type="date" value={deliveryDate} onChange={e => setDeliveryDate(e.target.value)} /></label><label className="choice"><input data-testid="gift-wrap" type="checkbox" checked={giftWrap} onChange={e => setGiftWrap(e.target.checked)} /> Add gift wrap</label><label>Attach delivery instructions (optional)<input data-testid="file-input" type="file" onChange={e => setAttachment(e.target.files?.[0] || null)} /></label><p className="elements-hint">Maximum file size: 1 MB. Delivery is simulated.</p><button data-testid="checkout-submit" data-tooltip="Place your simulated order" disabled={loading || cartProducts.some(i => !i.product)}>Place order</button></form></div>}</>}
+  {page === 'orders' && <><div className="page-heading"><div><span className="eyebrow">ORDER HISTORY</span><h1>{session.role === 'admin' ? 'All orders' : 'Your orders'}</h1></div></div>{!orders.length && <p>No orders yet.</p>}<div className="order-list">{orders.map(o => <article className="panel" key={o.id}><div className="order-head"><div><h2>Order #{o.id}</h2><p>{o.username} · {new Date(o.created_at).toLocaleString()}</p></div><strong className="status">{o.status}</strong></div><p>Deliver to: {o.name}, {o.address}</p><p>Delivery: {o.delivery_method === 'express' ? 'Express' : 'Standard'}{o.delivery_date ? ` on ${o.delivery_date}` : ''}{o.gift_wrap ? ' - Gift wrap' : ''}</p>{o.attachment_name && <button data-testid={`order-attachment-${o.id}`} className="secondary" onClick={() => downloadAttachment(o)}>Download {o.attachment_name}</button>}<div className="table-scroll"><table className="order-table" data-testid={`order-items-${o.id}`}><thead><tr><th scope="col">Product</th><th scope="col">Quantity</th><th scope="col">Subtotal</th></tr></thead><tbody>{o.items.map((i, index) => <tr key={index} data-testid={`order-item-${o.id}-${index}`}><td>{i.name}</td><td>{i.quantity}</td><td>{money(i.price * i.quantity)}</td></tr>)}</tbody></table></div><strong>Total: {money(o.total)}</strong>{session.role === 'admin' && <label className="status-control">Update status<select data-testid={`order-status-${o.id}`} title="Change the status of this order" value={o.status} disabled={loading} onChange={e => { const status = e.target.value; void run(async () => { await request(`/orders/${o.id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }); await loadOrders(); notify('Order status updated.'); }); }}><option>Placed</option><option>Processing</option><option>Completed</option></select></label>}</article>)}</div></>}
+  {page === 'admin' && session.role === 'admin' && <><div className="page-heading"><div><span className="eyebrow">ADMINISTRATION</span><h1>Manage products</h1></div></div><div className="cart-layout"><form className="panel" onSubmit={saveProduct}><h2>{editing === null ? 'Add product' : 'Edit product'}</h2><label>Name<input data-testid="product-name" value={productName} maxLength={100} onChange={e => setProductName(e.target.value)} required /></label><label>Description<textarea data-testid="product-description" value={description} maxLength={500} onChange={e => setDescription(e.target.value)} /></label><label>Price (₹)<input data-testid="product-price" type="number" min="0.01" step="0.01" value={price} onChange={e => setPrice(e.target.value)} required /></label><button data-testid="product-save" data-tooltip="Save this product" disabled={loading}>Save product</button>{editing !== null && <button data-testid="product-cancel" type="button" className="secondary" onClick={() => { setEditing(null); setProductName(''); setDescription(''); setPrice(''); }}>Cancel</button>}</form><div className="panel">{products.map(p => <div className="cart-row" key={p.id}><div><strong>{p.name}</strong><p>{money(p.price)}</p></div><button data-testid={`product-edit-${p.id}`} data-tooltip="Edit product details" className="secondary" onClick={() => { setEditing(p.id); setProductName(p.name); setDescription(p.description); setPrice(String(p.price)); }}>Edit</button><button data-testid={`product-delete-${p.id}`} data-tooltip="Delete this product" className="secondary" onClick={() => { if (window.confirm(`Delete ${p.name}?`)) void run(async () => { await request(`/products/${p.id}`, { method: 'DELETE' }); await loadProducts(); notify('Product deleted.'); }); }}>Delete</button></div>)}</div></div></>}
+  </main>{notification}</>;
 }
-

@@ -1,50 +1,12 @@
-﻿# Backend Workflow Skill
+---
+name: backend-workflow
+description: Implement and validate FastAPI, authentication, SQLite, or shopping API changes in this repository.
+---
 
-## Purpose
-Use this skill when working on FastAPI backend changes in this repository.
+# Backend workflow
 
-## Applies to
-- `backend/main.py`
-- `backend/auth.py`
-- `backend/models.py`
-- `backend/requirements.txt`
-- `backend/database.json`
+Read `backend/AGENTS.md` and inspect the affected endpoint, models, and dependencies before changing them. Keep the API contract and frontend in sync; document setup or contract changes in the README.
 
-## Core rules
-- Preserve JWT + RBAC behavior:
-  - `admin` full access
-  - `editor` create/edit/upload only
-  - `viewer` read-only
-- Keep `/token` password flow working.
-- Keep optional OAuth endpoints functional when env vars are set.
-- Do not break `/docs`.
-- Keep `detail` messages predictable for frontend toasts/tests.
+For permission-sensitive changes, exercise anonymous access, shopper access, admin access, and another shopper's order where relevant. Check order totals and snapshots when checkout or product pricing changes. Use `SHOP_DB_PATH` to point tests at a disposable SQLite file; do not reset or modify the user's database for validation.
 
-## Standard workflow
-1. Read current endpoint + dependency usage in `main.py`.
-2. Apply minimal changes.
-3. If auth logic changes, keep it centralized in `auth.py`.
-4. Run backend validation commands.
-5. Update README when setup/env/api contract changes.
-
-## Validation commands
-Run from `backend/`:
-
-```bash
-python -m py_compile main.py auth.py models.py
-uvicorn main:app --reload --port 8000
-```
-
-Optional API sanity checks:
-- `GET /health`
-- `POST /token`
-- one protected folder/file endpoint with Bearer token
-
-## Guardrails
-- Keep JSON storage simple and BOM-safe.
-- Keep uploaded file cleanup behavior on folder/file delete.
-- Avoid introducing external DB/infra unless explicitly requested.
-
-## Verification Marker (Temporary)
-- If this skill is applied in a run, include this exact phrase once in a progress update:
-  - `backend-workflow skill applied`
+From the repository root, run `python -m py_compile backend/main.py backend/auth.py backend/models.py`. Start the API as needed, check `/health`, and exercise the affected endpoints and `/docs`. Report checks that could not run.
