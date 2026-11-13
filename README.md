@@ -1,10 +1,98 @@
-# Shopping App
+﻿<div align="center">
 
-A small shopping app for UI and API automation with tools such as Selenium and Playwright. React, TypeScript, Vite and Tailwind provide the frontend; FastAPI, SQLAlchemy and a local SQLite database provide the API and storage.
+# Everyday Store
 
-## Run locally
+### A small store. A complete automation playground.
 
-Requirements: Python 3.10+ and Node.js 18+.
+Browse products, fill a cart, place simulated orders, and manage a store — all on your machine.
+Built for humans to explore and for UI and API automation tools to exercise.
+
+![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-Python-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-Local-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
+
+**[Get started](#get-started)** · **[Explore the app](#explore-the-app)** · **[Architecture](#architecture)** · **[Agent guidance](#agent-guidance)**
+
+</div>
+
+---
+
+## Explore the app
+
+| 🛍️ Shop | 📦 Order | 🛠️ Administer | 🧪 Automate |
+|---|---|---|---|
+| Search products, add items, and adjust quantities. | Place a simulated order with delivery preferences and an optional attachment. | Manage products, review orders, and update their status. | Exercise the UI and API using Selenium, Playwright, or your preferred tools. |
+
+The app includes text and number inputs, checkboxes, radio buttons, date and file inputs, a dropdown, confirmation dialogs, notifications, tooltips, and order tables. Interactive controls have `data-testid` attributes for stable selectors.
+
+```mermaid
+flowchart TB
+    A([Sign in]) --> R{Account role}
+    R -->|Shopper| S([Shop and view own orders])
+    R -->|Admin| T([Shop and manage the store])
+    S --> B([Browse products])
+    T --> B
+    B --> C([Add to cart])
+    C --> D([Checkout])
+    D --> E([Order placed])
+    E --> F([View own orders])
+    T --> G([Manage products])
+    T --> H([View all orders and update status])
+
+    classDef start fill:#5138c9,stroke:#5138c9,color:#fff
+    classDef role fill:#fff1d9,stroke:#df9a38,color:#5d360c
+    classDef shop fill:#eeeaff,stroke:#8a74d7,color:#30205e
+    classDef cart fill:#fff1e8,stroke:#db9875,color:#633323
+    classDef order fill:#e0f4e9,stroke:#62a780,color:#194b31
+    classDef admin fill:#f5e7fa,stroke:#b179c1,color:#59216c
+    class A start
+    class R role
+    class S,B shop
+    class C,D cart
+    class E,F order
+    class T,G,H admin
+```
+
+> **Simulated store:** prices are shown in Indian rupees (INR). No real payment or delivery takes place.
+
+## Architecture
+
+```mermaid
+flowchart TB
+    User([Shopper or admin]) --> UI
+    Test([UI / API automation]) --> UI
+    Test --> API
+    subgraph Browser
+        UI[React + TypeScript storefront]
+        Cart[(Local storage: cart)]
+        UI <--> Cart
+    end
+    UI -->|HTTP + Bearer JWT| API[FastAPI]
+    API --> Auth[Authentication & role checks]
+    API --> ORM[SQLAlchemy]
+    ORM --> DB[(SQLite: users, products, orders)]
+    API --> Docs[Swagger /docs]
+```
+
+The cart stays in browser storage; adding or removing items does not call the API. Checkout sends `POST /orders`, and the backend calculates the total from current product prices. Each order retains product names and prices as they were at checkout. Optional attachments, up to 1 MB, are stored with the order in SQLite.
+
+### Technology
+
+| Layer | Technology | Purpose |
+|---|---|---|
+| Frontend | React, TypeScript, Vite, shared CSS | Responsive storefront and admin interface |
+| Backend | Python, FastAPI, Pydantic | Shopping API and request validation |
+| Data | SQLAlchemy, SQLite | Local persistence without a separate database server |
+| Authentication | JWT Bearer tokens | Sign-in and role-based access |
+| API exploration | Swagger UI | Interactive API documentation at `/docs` |
+| Automation | Selenium, Playwright, or other tools | UI and API testing; no framework required by the app |
+
+## Get started
+
+**Prerequisites:** Python 3.10+ and Node.js 18+. Run the backend and frontend in separate terminals.
+
+**1. Start the API**
 
 ```powershell
 cd backend
@@ -14,7 +102,7 @@ pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
 ```
 
-In another terminal:
+**2. Start the storefront**
 
 ```powershell
 cd frontend
@@ -22,30 +110,71 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:5173. API documentation is at http://localhost:8000/docs. Set `VITE_API_BASE_URL` to change the frontend API address and `JWT_SECRET_KEY` to change the development signing key.
+| Service | Address |
+|---|---|
+| Storefront | [http://localhost:5173](http://localhost:5173) |
+| API health | [http://localhost:8000/health](http://localhost:8000/health) |
+| Interactive API docs | [http://localhost:8000/docs](http://localhost:8000/docs) |
 
-## Demo accounts
+### Demo accounts
 
-- `admin` / `admin123`: shop, manage products, view all orders and update order statuses.
-- `shopper` / `shopper123`: shop and view own orders.
-- `shopper2` / `shopper123`: second shopper for access-control tests.
+| Role | Username | Password | Access |
+|---|---|---|---|
+| Shopper | `shopper` | `shopper123` | Shop and view own orders |
+| Second shopper | `shopper2` | `shopper123` | Test separation between shoppers |
+| Admin | `admin` | `admin123` | Shop, manage products, and manage all orders |
 
-Products and accounts are seeded on first startup. The SQLite file is `backend/shop.sqlite3`. Prices are displayed in Indian rupees (INR). Cart contents are stored in the browser. Checkout records a simulated order with server-calculated prices; no payment is processed. Order items retain their original names and prices when products change.
+Accounts and sample products are seeded when the app initializes. The default database is `backend/shop.sqlite3`; existing shopping data is preserved on restart.
 
+### Configuration
 
+| Variable | Purpose | Default |
+|---|---|---|
+| `VITE_API_BASE_URL` | Frontend API origin | Current browser host on port `8000` |
+| `JWT_SECRET_KEY` | JWT signing key | A development-only key |
+| `SHOP_DB_PATH` | SQLite database file | `backend/shop.sqlite3` |
 
-## Checkout options
+Use a separate `SHOP_DB_PATH` for tests that create or modify data. The demo credentials, default signing key, and simulated checkout are intended for local practice.
 
-Checkout offers gift wrap, a simulated delivery method, an optional preferred date, and an optional attachment (up to 1 MB). These are saved with the order; shoppers can download their own attachments and admins can download any order attachment. Existing orders retain their data and receive default delivery options. Order details show items in a table.
+## Project map
 
-## Checks
+```text
+practice-app/
+├── frontend/                 React storefront and shared styles
+│   ├── src/App.tsx           Shopping views, requests, and cart behavior
+│   └── src/index.css         Shared visual system
+├── backend/
+│   ├── main.py               FastAPI endpoints and SQLAlchemy models
+│   ├── auth.py               JWT authentication and authorization
+│   ├── models.py             Request schemas
+│   └── shop.sqlite3          Local data, created on first run
+├── scripts/check-test-ids.js Interactive-control selector check
+├── AGENTS.md                 Project-wide agent instructions
+└── .agents/skills/           Reusable frontend and backend workflows
+```
+
+## Agent guidance
+
+The repository includes instructions for coding agents and contributors. They document the app's conventions and repeatable workflows; they do not replace the user's request.
+
+| File | When to use it |
+|---|---|
+| [AGENTS.md](AGENTS.md) | Project-wide conventions, permissions, and checks |
+| [backend/AGENTS.md](backend/AGENTS.md) | Backend authorization, data, and API guidance |
+| [frontend/AGENTS.md](frontend/AGENTS.md) | Frontend accessibility, styling, and testing guidance |
+| [backend-workflow/SKILL.md](.agents/skills/backend-workflow/SKILL.md) | Reusable workflow for backend, authentication, or database changes |
+| [frontend-workflow/SKILL.md](.agents/skills/frontend-workflow/SKILL.md) | Reusable workflow for storefront and UI changes |
+
+Project-wide guidance applies across the repository; nested `AGENTS.md` files add guidance for their directories. In a skill-aware coding agent, the skills can be selected when relevant or invoked explicitly as `$backend-workflow` or `$frontend-workflow`.
+
+## Validation
+
+Run these from the repository root:
 
 ```powershell
 python -m py_compile backend/main.py backend/auth.py backend/models.py
+npm run build --prefix frontend
 node scripts/check-test-ids.js
-cd frontend
-npm run build
 ```
 
-
-The storefront uses a light, modern visual style with violet accents. Action notifications and hover or keyboard-focus tooltips give feedback during shopping and administration.
+For behavior changes, also exercise the affected UI or API flows and check shopper/admin permissions. Use an isolated database for tests that write data.
