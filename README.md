@@ -2,10 +2,10 @@
 
 # Everyday Store
 
-### A small store. A complete automation playground.
+### A small store for everyday finds.
 
 Browse products, fill a cart, place simulated orders, and manage a store — all on your machine.
-Built for humans to explore and for UI and API automation tools to exercise.
+Explore a simple shopping experience with local data and simulated checkout.
 
 ![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
@@ -20,11 +20,11 @@ Built for humans to explore and for UI and API automation tools to exercise.
 
 ## Explore the app
 
-| 🛍️ Shop | 📦 Order | 🛠️ Administer | 🧪 Automate |
-|---|---|---|---|
-| Search products, add items, and adjust quantities. | Place a simulated order with delivery preferences and an optional attachment. | Manage products, review orders, and update their status. | Exercise the UI and API using Selenium, Playwright, or your preferred tools. |
+| Shop | Order | Administer |
+|---|---|---|
+| Search products, add items, and adjust quantities. | Place a simulated order with delivery preferences and an optional attachment. | Manage products, review orders, and update their status. |
 
-The app includes text and number inputs, checkboxes, radio buttons, date and file inputs, a dropdown, confirmation dialogs, notifications, tooltips, and order tables. Interactive controls have `data-testid` attributes for stable selectors.
+Choose gift wrap, a delivery method, a preferred date, and an optional attachment at checkout.
 
 ```mermaid
 flowchart LR
@@ -55,8 +55,6 @@ flowchart LR
 ```mermaid
 flowchart TB
     User([Shopper or admin]) --> UI
-    Test([UI / API automation]) --> UI
-    Test --> API
     subgraph Browser
         UI[React + TypeScript storefront]
         Cart[(Local storage: cart)]
@@ -80,7 +78,6 @@ The cart stays in browser storage; adding or removing items does not call the AP
 | Data | SQLAlchemy, SQLite | Local persistence without a separate database server |
 | Authentication | JWT Bearer tokens | Sign-in and role-based access |
 | API exploration | Swagger UI | Interactive API documentation at `/docs` |
-| Automation | Selenium, Playwright, or other tools | UI and API testing; no framework required by the app |
 
 ## Get started
 
@@ -115,7 +112,7 @@ npm run dev
 | Role | Username | Password | Access |
 |---|---|---|---|
 | Shopper | `shopper` | `shopper123` | Shop and view own orders |
-| Second shopper | `shopper2` | `shopper123` | Test separation between shoppers |
+| Second shopper | `shopper2` | `shopper123` | Shop and view own orders |
 | Admin | `admin` | `admin123` | Shop, manage products, and manage all orders |
 
 Accounts and sample products are seeded when the app initializes. The default database is `backend/shop.sqlite3`; existing shopping data is preserved on restart.
@@ -128,7 +125,7 @@ Accounts and sample products are seeded when the app initializes. The default da
 | `JWT_SECRET_KEY` | JWT signing key | A development-only key |
 | `SHOP_DB_PATH` | SQLite database file | `backend/shop.sqlite3` |
 
-Use a separate `SHOP_DB_PATH` for tests that create or modify data. The demo credentials, default signing key, and simulated checkout are intended for local practice.
+Set `SHOP_DB_PATH` to use a separate database file. The demo credentials, default signing key, and simulated checkout are intended for local practice.
 
 ## Project map
 
@@ -142,7 +139,6 @@ practice-app/
 │   ├── auth.py               JWT authentication and authorization
 │   ├── models.py             Request schemas
 │   └── shop.sqlite3          Local data, created on first run
-├── scripts/check-test-ids.js Interactive-control selector check
 ├── AGENTS.md                 Project-wide agent instructions
 └── .agents/skills/           Reusable frontend and backend workflows
 ```
@@ -155,7 +151,7 @@ The repository includes instructions for coding agents and contributors. They do
 |---|---|
 | [AGENTS.md](AGENTS.md) | Project-wide conventions, permissions, and checks |
 | [backend/AGENTS.md](backend/AGENTS.md) | Backend authorization, data, and API guidance |
-| [frontend/AGENTS.md](frontend/AGENTS.md) | Frontend accessibility, styling, and testing guidance |
+| [frontend/AGENTS.md](frontend/AGENTS.md) | Frontend accessibility and styling guidance |
 | [backend-workflow/SKILL.md](.agents/skills/backend-workflow/SKILL.md) | Reusable workflow for backend, authentication, or database changes |
 | [frontend-workflow/SKILL.md](.agents/skills/frontend-workflow/SKILL.md) | Reusable workflow for storefront and UI changes |
 
@@ -168,7 +164,6 @@ Run these from the repository root:
 ```powershell
 python -m py_compile backend/main.py backend/auth.py backend/models.py
 npm run build --prefix frontend
-node scripts/check-test-ids.js
 ```
 
-For behavior changes, also exercise the affected UI or API flows and check shopper/admin permissions. Use an isolated database for tests that write data.
+For behavior changes, also check the affected UI or API flows and shopper/admin permissions.
